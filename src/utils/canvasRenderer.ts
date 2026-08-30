@@ -353,9 +353,12 @@ function drawDalilakSquircleBadge(
   ctx.restore();
 }
 
-const OFFICIAL_WHATSAPP_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="wag" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2325D366"/><stop offset="100%" stop-color="%23128C7E"/></linearGradient></defs><circle cx="256" cy="256" r="256" fill="url(%23wag)"/><path fill="%23FFFFFF" d="M380.9 129.1C342.3 90.5 291 69.3 236.4 69.3c-112.5 0-204 91.5-204 204 0 35.9 9.4 71 27.2 102L32 480l108.2-28.4c29.8 16.3 63.3 24.8 96.2 24.8h.1c112.4 0 206-91.5 206-204 0-54.5-21.2-105.7-61.6-143.3zm-144.5 313.9c-30.5 0-60.4-8.2-86.4-23.6l-6.2-3.7-64.2 16.8 17.1-62.6-4.1-6.5c-17-27-26-58.2-26-90.3 0-93.5 76.1-169.6 169.7-169.6 45.3 0 87.9 17.6 119.9 49.7 32 32.1 49.6 74.7 49.5 120 0 93.6-78 169.6-171.3 169.6zm93-127c-5.1-2.6-30.2-14.9-34.9-16.5-4.7-1.7-8.1-2.6-11.5 2.6-3.4 5.1-13.1 16.5-16.2 20-3 3.4-6 3.9-11 1.3-30-15-49.6-26.7-69.4-60.7-5.2-9 5.2-8.4 15-27.9 1.7-3.4.8-6.3-.5-8.9-1.3-2.6-11.5-27.7-15.7-37.9-4.1-9.9-8.4-8.5-11.5-8.7-2.9-.2-6.3-.2-9.7-.2-3.4 0-8.9 1.3-13.6 6.3-4.7 5.1-17.8 17.4-17.8 42.5 0 25.1 18.3 49.4 20.8 52.8 2.6 3.4 35.9 54.9 87.1 77 32.4 14 45 15.2 61.2 12.8 9.8-1.5 30.2-12.3 34.4-24.3 4.2-12 4.2-22.1 3-24.3-1.3-2.2-4.7-3.5-9.8-6.1z"/></svg>`;
+const OFFICIAL_WHATSAPP_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%2325D366" d="M256 0C114.6 0 0 114.6 0 256c0 45.3 11.9 89.6 34.4 128.7L2.1 497.8c-2.6 7.6 3.8 15.3 11.7 14.1l117.8-17.7c37.7 20.3 80.3 31.8 124.4 31.8 141.4 0 256-114.6 256-256S397.4 0 256 0z"/><path fill="%23FFFFFF" d="M380.9 129.1C342.3 90.5 291 69.3 236.4 69.3c-112.5 0-204 91.5-204 204 0 35.9 9.4 71 27.2 102L32 480l108.2-28.4c29.8 16.3 63.3 24.8 96.2 24.8h.1c112.4 0 206-91.5 206-204 0-54.5-21.2-105.7-61.6-143.3zm-144.5 313.9c-30.5 0-60.4-8.2-86.4-23.6l-6.2-3.7-64.2 16.8 17.1-62.6-4.1-6.5c-17-27-26-58.2-26-90.3 0-93.5 76.1-169.6 169.7-169.6 45.3 0 87.9 17.6 119.9 49.7 32 32.1 49.6 74.7 49.5 120 0 93.6-78 169.6-171.3 169.6zm93-127c-5.1-2.6-30.2-14.9-34.9-16.5-4.7-1.7-8.1-2.6-11.5 2.6-3.4 5.1-13.1 16.5-16.2 20-3 3.4-6 3.9-11 1.3-30-15-49.6-26.7-69.4-60.7-5.2-9 5.2-8.4 15-27.9 1.7-3.4.8-6.3-.5-8.9-1.3-2.6-11.5-27.7-15.7-37.9-4.1-9.9-8.4-8.5-11.5-8.7-2.9-.2-6.3-.2-9.7-.2-3.4 0-8.9 1.3-13.6 6.3-4.7 5.1-17.8 17.4-17.8 42.5 0 25.1 18.3 49.4 20.8 52.8 2.6 3.4 35.9 54.9 87.1 77 32.4 14 45 15.2 61.2 12.8 9.8-1.5 30.2-12.3 34.4-24.3 4.2-12 4.2-22.1 3-24.3-1.3-2.2-4.7-3.5-9.8-6.1z"/></svg>`;
+
+const OFFICIAL_PHONE_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="256" fill="%23f59e0b"/><path fill="%23070d18" d="M362.7 321.6c-15-4-30.3 3.4-35.6 17.4l-18 48c-84.5-42.3-152.1-109.9-194.4-194.4l48-18c14-5.3 21.4-20.6 17.4-35.6l-24-90c-4.3-16.1-19.1-27-35.8-27H64C46.3 22 32 36.3 32 54c0 237.5 192.5 430 430 430 17.7 0 32-14.3 32-32v-56.3c0-16.7-10.9-31.5-27-35.8l-90-24z"/></svg>`;
 
 let cachedWhatsAppImg: HTMLImageElement | null = null;
+let cachedPhoneImg: HTMLImageElement | null = null;
 
 async function drawWhatsAppIcon(
   ctx: CanvasRenderingContext2D,
@@ -371,51 +374,18 @@ async function drawWhatsAppIcon(
   }
 }
 
-function drawPhoneHandsetIcon(
+async function drawPhoneIcon(
   ctx: CanvasRenderingContext2D,
   cx: number,
   cy: number,
-  size: number,
-  bgColor = '#e5a82e',
-  iconColor = '#070d18'
+  size: number
 ) {
-  ctx.save();
-  ctx.translate(cx, cy);
-
-  // Background Circle
-  ctx.fillStyle = bgColor;
-  ctx.beginPath();
-  ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Handset silhouette
-  const s = size * 0.44;
-  ctx.save();
-  ctx.rotate(-Math.PI * 0.18);
-  ctx.translate(-s * 0.05, -s * 0.08);
-
-  ctx.fillStyle = iconColor;
-  ctx.strokeStyle = iconColor;
-
-  // Left ear capsule
-  ctx.beginPath();
-  ctx.arc(-s * 0.45, -s * 0.45, s * 0.22, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Right mouth capsule
-  ctx.beginPath();
-  ctx.arc(s * 0.45, s * 0.45, s * 0.22, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Connecting bridge
-  ctx.lineWidth = s * 0.38;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.arc(0, 0, s * 0.48, Math.PI * 0.72, Math.PI * 1.78, true);
-  ctx.stroke();
-
-  ctx.restore();
-  ctx.restore();
+  if (!cachedPhoneImg) {
+    cachedPhoneImg = await loadImage(OFFICIAL_PHONE_SVG);
+  }
+  if (cachedPhoneImg) {
+    ctx.drawImage(cachedPhoneImg, cx - size / 2, cy - size / 2, size, size);
+  }
 }
 
 async function drawCenterLogoInQr(
@@ -2431,16 +2401,18 @@ export async function renderPosterToCanvas(
       const numFontSize = 24;
       ctx.font = `900 ${numFontSize}px 'Outfit', 'Cairo', 'Tajawal', sans-serif`;
       ctx.letterSpacing = '2.5px';
-      const actMeasured = ctx.measureText(cleanNum);
+      const textW = ctx.measureText(cleanNum).width;
 
       const showWa = config.activityShowWhatsAppIcon !== false;
       const showPh = config.activityShowPhoneIcon !== false;
       const iconCount = (showWa ? 1 : 0) + (showPh ? 1 : 0);
       const iconSize = 28;
-      const iconSpacing = 6;
-      const iconsTotalW = iconCount > 0 ? (iconCount * iconSize) + ((iconCount - 1) * iconSpacing) + 12 : 0;
+      const iconGap = 6;
+      const iconsBlockW = iconCount > 0 ? (iconCount * iconSize) + ((iconCount - 1) * iconGap) : 0;
+      const spacingBetween = iconCount > 0 ? 12 : 0;
 
-      const pillW = Math.max(220, actMeasured.width + iconsTotalW + 48);
+      const totalContentW = textW + spacingBetween + iconsBlockW;
+      const pillW = Math.max(220, totalContentW + 48);
       const pillH = 44;
       const pillX = rightColCenterX - pillW / 2;
       const pillCenterY = rightY + pillH / 2;
@@ -2451,7 +2423,7 @@ export async function renderPosterToCanvas(
       ctx.shadowOffsetY = 2;
 
       // Luxury Pill Background
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
       ctx.strokeStyle = config.accentColor || '#e5a82e';
       ctx.lineWidth = 2.4;
       drawRoundRect(ctx, pillX, rightY, pillW, pillH, pillH / 2, true, true);
@@ -2460,28 +2432,27 @@ export async function renderPosterToCanvas(
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
 
-      // Center both icons + digits
-      const totalContentW = actMeasured.width + iconsTotalW;
+      // Start X for entire centered group (Digits + Icons)
       let curX = rightColCenterX - totalContentW / 2;
 
-      if (showWa) {
-        await drawWhatsAppIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize);
-        curX += iconSize + iconSpacing;
-      }
-      if (showPh) {
-        drawPhoneHandsetIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize, config.accentColor || '#e5a82e', '#070d18');
-        curX += iconSize + iconSpacing;
-      }
-      if (iconCount > 0) {
-        curX += 6;
-      }
-
-      // Large crisp digits
+      // 1. Draw digits
       ctx.fillStyle = config.textColor || '#0f172a';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.fillText(cleanNum, curX, pillCenterY + 1);
       ctx.letterSpacing = '0px';
+
+      curX += textW + spacingBetween;
+
+      // 2. Draw icons on the right
+      if (showWa) {
+        await drawWhatsAppIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize);
+        curX += iconSize + iconGap;
+      }
+      if (showPh) {
+        await drawPhoneIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize);
+        curX += iconSize + iconGap;
+      }
 
       rightY += pillH + 16;
     }
@@ -2621,16 +2592,18 @@ export async function renderPosterToCanvas(
       const numFontSize = isSquare ? 23 : 26;
       ctx.font = `900 ${numFontSize}px 'Outfit', 'Cairo', 'Tajawal', sans-serif`;
       ctx.letterSpacing = '2.5px';
-      const actMeasured = ctx.measureText(cleanNum);
+      const textW = ctx.measureText(cleanNum).width;
 
       const showWa = config.activityShowWhatsAppIcon !== false;
       const showPh = config.activityShowPhoneIcon !== false;
       const iconCount = (showWa ? 1 : 0) + (showPh ? 1 : 0);
       const iconSize = isSquare ? 28 : 32;
-      const iconSpacing = 8;
-      const iconsTotalW = iconCount > 0 ? (iconCount * iconSize) + ((iconCount - 1) * iconSpacing) + 14 : 0;
+      const iconGap = 8;
+      const iconsBlockW = iconCount > 0 ? (iconCount * iconSize) + ((iconCount - 1) * iconGap) : 0;
+      const spacingBetween = iconCount > 0 ? 14 : 0;
 
-      const pillW = Math.max(isSquare ? 200 : 250, actMeasured.width + iconsTotalW + 52);
+      const totalContentW = textW + spacingBetween + iconsBlockW;
+      const pillW = Math.max(isSquare ? 200 : 250, totalContentW + 52);
       const pillH = isSquare ? 42 : 48;
       const pillX = (baseWidth - pillW) / 2;
       const pillCenterY = currentY + pillH / 2;
@@ -2641,7 +2614,7 @@ export async function renderPosterToCanvas(
       ctx.shadowOffsetY = 3;
 
       // Luxury Pill Background: semi-translucent crisp background with accent border
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
       ctx.strokeStyle = config.accentColor || '#e5a82e';
       ctx.lineWidth = 2.5;
       drawRoundRect(ctx, pillX, currentY, pillW, pillH, pillH / 2, true, true);
@@ -2650,28 +2623,27 @@ export async function renderPosterToCanvas(
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
 
-      // Center both icons + digits
-      const totalContentW = actMeasured.width + iconsTotalW;
+      // Start X to center the group (Digits + Icons)
       let curX = (baseWidth - totalContentW) / 2;
 
-      if (showWa) {
-        await drawWhatsAppIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize);
-        curX += iconSize + iconSpacing;
-      }
-      if (showPh) {
-        drawPhoneHandsetIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize, config.accentColor || '#e5a82e', '#070d18');
-        curX += iconSize + iconSpacing;
-      }
-      if (iconCount > 0) {
-        curX += 6;
-      }
-
-      // Large crisp digits
+      // 1. Draw digits
       ctx.fillStyle = config.textColor || '#0f172a';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.fillText(cleanNum, curX, pillCenterY + 1);
       ctx.letterSpacing = '0px';
+
+      curX += textW + spacingBetween;
+
+      // 2. Draw icons on the right
+      if (showWa) {
+        await drawWhatsAppIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize);
+        curX += iconSize + iconGap;
+      }
+      if (showPh) {
+        await drawPhoneIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize);
+        curX += iconSize + iconGap;
+      }
 
       currentY += pillH + 18;
     }
@@ -2810,7 +2782,7 @@ export async function renderPosterToCanvas(
       curSlotX -= (iconSize + iconGap);
     }
     if (showFooterPh) {
-      drawPhoneHandsetIcon(ctx, curSlotX, footerContentCenterY, iconSize, config.footerAccentColor || '#e5a82e', '#070d18');
+      await drawPhoneIcon(ctx, curSlotX, footerContentCenterY, iconSize);
       curSlotX -= (iconSize + iconGap);
     }
 
