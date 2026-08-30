@@ -7,6 +7,7 @@ import { BUSINESS_PRESETS, THEME_PRESETS, generateRandomMix } from './presets';
 import { generateHighResBlob } from './utils/canvasRenderer';
 import { generateSmartContextualTexts } from './utils/textGeneratorEngine';
 import confetti from 'canvas-confetti';
+import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { 
   Sparkles, 
   MapPin, 
@@ -165,8 +166,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-['Tajawal',sans-serif] overflow-x-hidden pb-20 lg:pb-0">
+    <div className="min-h-[100dvh] bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-['Tajawal',sans-serif] overflow-x-hidden pb-24 lg:pb-0 pt-[var(--sat)]">
       
+      {/* PWA Install Banner */}
+      <PwaInstallPrompt />
+
       {/* Header Bar */}
       <Header
         onSelectPreset={handleSelectPreset}
@@ -326,7 +330,7 @@ export default function App() {
       </main>
 
       {/* Floating Bottom Quick Action Dock for Mobile Devices */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-2xl border-t border-slate-800/90 p-2.5 px-3 shadow-2xl flex items-center justify-between gap-2">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-2xl border-t border-slate-800/90 p-2.5 px-3 pb-[calc(0.625rem+var(--sab))] shadow-2xl flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={() => setMobileActiveView(mobileActiveView === 'controls' ? 'preview' : 'controls')}

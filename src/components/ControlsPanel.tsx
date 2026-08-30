@@ -76,6 +76,8 @@ import {
   BUSINESS_CATEGORIES, 
   SmartGeneratedTexts 
 } from '../utils/textGeneratorEngine';
+import { AiTextModal } from './AiTextModal';
+import { DETAILED_CATEGORIES, rephraseTextWithAi } from '../utils/aiTextGenerator';
 
 const RenderBusinessIcon: React.FC<{ iconId: string; className?: string }> = ({ iconId, className = 'w-5 h-5' }) => {
   switch (iconId) {
@@ -146,6 +148,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<TabKey>('business');
   const [showAiSuccessToast, setShowAiSuccessToast] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const qrInputRef = useRef<HTMLInputElement>(null);
 
@@ -257,36 +260,48 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
         </div>
       )}
 
-      {/* Magic Smart Text Generator Banner */}
+      {/* Magic AI Text Generator Banner */}
       <div className="px-4 sm:px-5 pt-3 pb-0">
         <div className="p-3 bg-gradient-to-r from-amber-500/15 via-slate-850 to-slate-900 border border-amber-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-sm">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
-              <Bot className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 shadow-md shadow-amber-500/20 shrink-0">
+              <Bot className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs font-black text-slate-100">
-                  مولّد النصوص الذكي لـ {config.businessName ? `"${config.businessName}"` : 'نشاطك'}
+                  توليد النصوص بالذكاء الاصطناعي ✨
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  {smartAnalysis.detectedCategory.name}
+                  {config.category || smartAnalysis.detectedCategory.name}
                 </span>
               </div>
               <span className="text-[11px] text-slate-400 block mt-0.5">
-                يتوقع طبيعة الخدمة واسم الشركة ويصيغ عبارات تقييم تسويقية دقيقة
+                توليد عبارات تقييم دعائية ذكية حسب تصنيف نشاطك
               </span>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleApplyFullSmartPack}
-            className="self-end sm:self-auto px-3.5 py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-md shadow-amber-500/20 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shrink-0"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>تطبيق الحزمة الذكية ✨</span>
-          </button>
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="px-3.5 py-2 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-md shadow-amber-500/20 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shrink-0 min-h-[38px]"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>توليد ذكي 🤖</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleApplyFullSmartPack}
+              className="px-3 py-2 bg-slate-800 hover:bg-slate-750 text-amber-400 border border-amber-500/30 text-xs font-bold rounded-xl transition-all active:scale-95 cursor-pointer flex items-center gap-1 shrink-0 min-h-[38px]"
+              title="تطبيق تلقائي فوري للألوان والنصوص"
+            >
+              <Wand2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">حزمة فورية</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -386,16 +401,49 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
 
             {/* Category & Service Nature */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span>طبيعة الخدمة أو تصنيف النشاط</span>
-                <span className="text-[10px] text-slate-400">مثل: كافيه مختص، عيادة أسنان، مغسلة سيارات</span>
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-amber-400" />
+                  تصنيف النشاط التجاري (القطاع)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsAiModalOpen(true)}
+                  className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/30"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  <span>توليد ذكي بالـ AI 🤖</span>
+                </button>
+              </div>
+
+              {/* Category Quick Select Dropdown */}
+              <select
+                id="category-select-dropdown"
+                value={config.category}
+                onChange={(e) => {
+                  const newCatName = e.target.value;
+                  const matched = DETAILED_CATEGORIES.find((c) => c.name === newCatName);
+                  onChange((p) => ({
+                    ...p,
+                    category: newCatName,
+                    selectedIcon: matched?.icon || p.selectedIcon
+                  }));
+                }}
+                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 mb-2 font-bold cursor-pointer min-h-[44px]"
+              >
+                {DETAILED_CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+
               <input
                 type="text"
                 value={config.category}
                 onChange={(e) => onChange((p) => ({ ...p, category: e.target.value }))}
-                placeholder="مثال: غسيل وتلميع سيارات، مقهى وقهوة مختصة، مطعم إيطالي، عيادة جلدية"
-                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 min-h-[44px]"
+                placeholder="أو اكتب تصنيف مخصص: مثلاً ورشة سيارات، مقهى كوكيز، عيادة أسنان"
+                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-300 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 min-h-[38px]"
               />
             </div>
 
@@ -528,6 +576,33 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
         {/* ================= TAB 2: TEXTS & CTA ================= */}
         {activeTab === 'texts' && (
           <div className="space-y-5">
+
+            {/* AI Text Generator Launcher Button */}
+            <div className="p-4 bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-slate-900 border border-amber-500/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg shadow-amber-500/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 shadow-md shadow-amber-500/30 shrink-0">
+                  <Bot className="w-6 h-6 stroke-[2.5]" />
+                </div>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-black text-white flex items-center gap-2">
+                    <span>مولّد العبارات بالذكاء الاصطناعي</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black">AI</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-300 mt-0.5">
+                    توليد عبارات تسويقية حماسية، فاخرة، أو ترحيبية مخصصة لقطاعك
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsAiModalOpen(true)}
+                className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs rounded-xl shadow-md shadow-amber-500/20 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[42px]"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>فتح مولّد الـ AI ✨</span>
+              </button>
+            </div>
             
             {/* Smart Contextual Suggestions Customized for the Business */}
             <div className="p-3.5 bg-gradient-to-b from-amber-500/10 to-slate-850 border border-amber-500/30 rounded-2xl space-y-3">
@@ -568,10 +643,25 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
 
             {/* Main CTA Text */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span>النص الرئيسي لدعوة التقييم (سطرين كحد أقصى للحجم المثالي)</span>
-                <span className="text-[10px] text-slate-500">قابل للتعديل بحرية</span>
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-slate-300">
+                  النص الرئيسي لدعوة التقييم (سطرين كحد أقصى للحجم المثالي)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const cleanName = config.businessName || 'نشاطنا';
+                    onChange((p) => ({
+                      ...p,
+                      mainText: `كيف كانت تجربتك في ${cleanName} اليوم؟ ✨\nامسح الرمز وقيّمنا بـ 5 نجوم ★`
+                    }));
+                  }}
+                  className="text-[10px] text-amber-400 hover:underline font-bold flex items-center gap-1"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  صياغة ذكية ✨
+                </button>
+              </div>
               <textarea
                 id="input-main-text"
                 rows={3}
@@ -1435,6 +1525,26 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
         )}
 
       </div>
+
+      {/* AI Text Generator Modal */}
+      <AiTextModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        config={config}
+        onApplyTexts={(texts) => {
+          onChange((prev) => ({
+            ...prev,
+            mainText: texts.mainText,
+            secondaryText: texts.secondaryText,
+            businessSubtitle: texts.businessSubtitle || prev.businessSubtitle,
+            category: texts.category || prev.category,
+            selectedIcon: texts.selectedIcon || prev.selectedIcon,
+            themeId: texts.themeId || prev.themeId
+          }));
+          setShowAiSuccessToast(true);
+          setTimeout(() => setShowAiSuccessToast(false), 3000);
+        }}
+      />
 
     </div>
   );

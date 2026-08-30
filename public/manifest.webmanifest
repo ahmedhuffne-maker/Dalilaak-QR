@@ -1,0 +1,39 @@
+{
+  "name": "صانع ملصقات التقييم - دليلك",
+  "short_name": "صانع الملصقات",
+  "description": "أداة متقدمة لتصميم وتوليد ملصقات وستاندات تقييم خرائط Google للأعمال والأنشطة التجارية مع رمز QR قابل للتخصيص ومحرك ذكاء اصطناعي",
+  "start_url": "/",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["business", "productivity", "utilities", "design"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "تصميم ملصق جديد",
+      "short_name": "تصميم جديد",
+      "description": "بدء تصميم ملصق أو ستاند تقييم فوري",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}

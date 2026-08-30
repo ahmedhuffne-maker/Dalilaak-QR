@@ -2,18 +2,36 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>صانع ملصقات التقييم</title>
-    <meta name="description" content="أداة متقدمة لتصميم ملصقات وستاندات تقييمات جوجل للأنشطة التجارية برمز QR قابل للتخصيص وخيارات طباعة متنوعة" />
-    <meta property="og:title" content="صانع ملصقات التقييم" />
-    <meta property="og:description" content="أداة متقدمة لتصميم ملصقات وستاندات تقييمات جوجل للأنشطة التجارية برمز QR قابل للتخصيص وخيارات طباعة متنوعة" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <title>صانع ملصقات التقييم - دليلك</title>
+    <meta name="description" content="أداة متقدمة لتصميم ملصقات وستاندات تقييمات جوجل للأنشطة التجارية برمز QR قابل للتخصيص ومحرك ذكاء اصطناعي وخيارات طباعة متنوعة" />
+    
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <meta name="theme-color" content="#020617" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="صانع الملصقات" />
+    <meta name="application-name" content="صانع ملصقات التقييم" />
+    
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon.svg" />
+    
+    <!-- Open Graph & Social -->
+    <meta property="og:title" content="صانع ملصقات التقييم - دليلك" />
+    <meta property="og:description" content="أداة متقدمة لتصميم ملصقات وستاندات تقييمات جوجل للأنشطة التجارية برمز QR قابل للتخصيص ومحرك ذكاء اصطناعي وخيارات طباعة متنوعة" />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icons/icon.svg" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,700;1,700&family=Aref+Ruqaa:wght@700&family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&family=Readex+Pro:wght@400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-slate-900 text-slate-100 min-h-screen font-['Tajawal',sans-serif] antialiased selection:bg-amber-500 selection:text-slate-950">
+  <body class="bg-slate-950 text-slate-100 min-h-[100dvh] font-['Tajawal',sans-serif] antialiased selection:bg-amber-500 selection:text-slate-950 overflow-x-hidden">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
