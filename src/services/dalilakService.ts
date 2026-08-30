@@ -121,7 +121,8 @@ export function mapBusinessToPosterConfig(
     ? `${business.name_en.toUpperCase()} • ${business.city || business.governorate || ''}`.trim()
     : (smartTexts.suggestedSubtitles[0] || addressParts.slice(0, 2).join(' • '));
 
-  // Phone numbers
+  // Registered Phone numbers
+  const registeredPhone = business.phone || business.secondary_phone || '';
   const mainPhone = business.phone || business.secondary_phone || prevConfig.footerPhone;
   const whatsappPhone = business.secondary_phone || business.phone || prevConfig.footerWhatsApp;
 
@@ -136,9 +137,6 @@ export function mapBusinessToPosterConfig(
   } else {
     qrTargetUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(businessName + ' ' + (business.city || business.governorate || ''))}`;
   }
-
-  // Activity registration number
-  const activityNum = business.invoice_number || business.id?.replace(/^biz_/, '') || '';
 
   // Extract logo photo if available
   let uploadedLogo = prevConfig.uploadedLogoDataUrl;
@@ -156,11 +154,11 @@ export function mapBusinessToPosterConfig(
     businessName: businessName,
     businessSubtitle: businessSubtitle || 'PREMIUM SERVICE & QUALITY',
     category: category,
-    showActivityNumber: Boolean(activityNum),
-    activityNumber: activityNum,
-    activityNumberLabel: 'رقم النشاط',
+    showActivityNumber: Boolean(registeredPhone),
+    activityNumber: registeredPhone,
+    activityNumberLabel: 'رقم التواصل',
     activityShowWhatsAppIcon: true,
-    activityShowPhoneIcon: true,
+    activityShowPhoneIcon: false,
 
     // Generated smart texts
     mainText: smartTexts.suggestedMainTexts[0] || `شاركنا رأيك وتقييمك\nبـ 5 نجوم ★`,
