@@ -189,15 +189,16 @@ export function mapBusinessToPosterConfig(
     footerAccentColor: theme.footerAccentColor,
     borderStyle: theme.borderStyle,
 
-    // Footer
+    // Footer (Fixed Dalilak Official Contact 01556221141 - WhatsApp only)
     showFooter: true,
-    footerPhone: mainPhone,
-    footerWhatsApp: whatsappPhone,
+    footerPhone: '01556221141',
+    footerWhatsApp: '01556221141',
     footerShowWhatsAppIcon: true,
-    footerShowPhoneIcon: true,
+    footerShowPhoneIcon: false,
     showDalilakBranding: true,
     dalilakText: 'دليلك',
     dalilakSubtext: 'المنصة الشاملة لإدارة وتوثيق الأنشطة والخدمات الميدانية',
+    footerWebsite: 'www.dalilaak.com',
     showGoogleBadge: true
   };
 }

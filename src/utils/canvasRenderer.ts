@@ -2785,17 +2785,17 @@ export async function renderPosterToCanvas(
 
     const footerContentCenterY = footerY + footerHeight / 2 + 2;
 
-    // Fixed Phone Number: Always ensure 01556221141 is used
-    const phoneToDisplay = config.footerPhone || '01556221141';
+    // Fixed Dalilak Official Phone Number: Always 01556221141
+    const phoneToDisplay = '01556221141';
 
-    // Left Side: Phone / Contact Pill with Gold Outline
-    const showFooterWa = config.footerShowWhatsAppIcon !== false;
-    const showFooterPh = !!config.footerShowPhoneIcon;
-    const footerIconCount = (showFooterWa ? 1 : 0) + (showFooterPh ? 1 : 0);
+    // Left Side: Phone / Contact Pill with Gold Outline (WhatsApp icon only)
+    const showFooterWa = true;
+    const showFooterPh = false;
+    const footerIconCount = 1;
 
     const iconSize = 34;
     const iconGap = 6;
-    const totalIconsW = footerIconCount > 0 ? (footerIconCount * iconSize) + ((footerIconCount - 1) * iconGap) + 12 : 0;
+    const totalIconsW = iconSize + 12;
     const phonePillW = isLandscape ? Math.max(240, 220 + totalIconsW) : Math.max(260, 230 + totalIconsW);
     const phonePillH = 48;
     const phonePillX = 30;
@@ -2808,14 +2808,8 @@ export async function renderPosterToCanvas(
 
     let curSlotX = phonePillX + phonePillW - 24;
 
-    if (showFooterWa) {
-      await drawWhatsAppIcon(ctx, curSlotX, footerContentCenterY, iconSize);
-      curSlotX -= (iconSize + iconGap);
-    }
-    if (showFooterPh) {
-      await drawPhoneIcon(ctx, curSlotX, footerContentCenterY, iconSize);
-      curSlotX -= (iconSize + iconGap);
-    }
+    await drawWhatsAppIcon(ctx, curSlotX, footerContentCenterY, iconSize);
+    curSlotX -= (iconSize + iconGap);
 
     const availableTextW = curSlotX - phonePillX - 6;
     ctx.fillStyle = '#ffffff';
