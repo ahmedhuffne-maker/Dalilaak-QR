@@ -2789,34 +2789,36 @@ export async function renderPosterToCanvas(
     const phoneToDisplay = '01556221141';
 
     // Left Side: Phone / Contact Pill with Gold Outline (WhatsApp icon only)
-    const showFooterWa = true;
-    const showFooterPh = false;
-    const footerIconCount = 1;
+    const iconSize = 30;
+    const fontSize = isLandscape ? 24 : 25;
+    ctx.font = `900 ${fontSize}px 'Outfit', 'Tajawal', Arial, sans-serif`;
+    const textMetrics = ctx.measureText(phoneToDisplay);
+    const textWidth = textMetrics.width;
 
-    const iconSize = 34;
-    const iconGap = 6;
-    const totalIconsW = iconSize + 12;
-    const phonePillW = isLandscape ? Math.max(240, 220 + totalIconsW) : Math.max(260, 230 + totalIconsW);
-    const phonePillH = 48;
+    // Snug, compact and perfectly balanced pill dimensions
+    const padX = 14;
+    const iconTextGap = 8;
+    const phonePillW = Math.round(textWidth + iconSize + iconTextGap + padX * 2);
+    const phonePillH = isLandscape ? 40 : 42;
     const phonePillX = 30;
     const phonePillY = footerContentCenterY - phonePillH / 2;
 
     // Golden Pill Outline
     ctx.strokeStyle = config.footerAccentColor || '#e5a82e';
-    ctx.lineWidth = 2.2;
+    ctx.lineWidth = 2.0;
     drawRoundRect(ctx, phonePillX, phonePillY, phonePillW, phonePillH, phonePillH / 2, false, true);
 
-    let curSlotX = phonePillX + phonePillW - 24;
+    // WhatsApp Icon (Placed cleanly inside right side of pill)
+    const iconCenterX = phonePillX + phonePillW - padX - iconSize / 2;
+    await drawWhatsAppIcon(ctx, iconCenterX, footerContentCenterY, iconSize);
 
-    await drawWhatsAppIcon(ctx, curSlotX, footerContentCenterY, iconSize);
-    curSlotX -= (iconSize + iconGap);
-
-    const availableTextW = curSlotX - phonePillX - 6;
+    // Phone Number Text (Enlarged, crisp & bold typography)
+    const textCenterX = phonePillX + padX + textWidth / 2;
     ctx.fillStyle = '#ffffff';
-    ctx.font = "bold 23px 'Outfit', 'Tajawal', Arial, sans-serif";
+    ctx.font = `900 ${fontSize}px 'Outfit', 'Tajawal', Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(phoneToDisplay, phonePillX + (availableTextW > 0 ? availableTextW / 2 + 10 : phonePillW / 2), footerContentCenterY);
+    ctx.fillText(phoneToDisplay, textCenterX, footerContentCenterY);
 
     // Right Side: Dalilak Official Branding & Golden Pin Lockup (Exact Reference match)
     if (config.showDalilakBranding) {
