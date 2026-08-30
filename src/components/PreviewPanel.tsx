@@ -14,7 +14,8 @@ import {
   Image as ImageIcon,
   QrCode,
   Upload,
-  Trash2
+  Trash2,
+  Dices
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import jsPDF from 'jspdf';
@@ -26,6 +27,7 @@ interface PreviewPanelProps {
   config: PosterConfig;
   onChangeFormat: (format: PosterFormat) => void;
   onChangeConfig?: React.Dispatch<React.SetStateAction<PosterConfig>>;
+  onRandomMix?: () => void;
   isRendering: boolean;
   setIsRendering: (state: boolean) => void;
 }
@@ -34,6 +36,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   config,
   onChangeFormat,
   onChangeConfig,
+  onRandomMix,
   isRendering,
   setIsRendering
 }) => {
@@ -288,35 +291,50 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
           </button>
         </div>
 
-        {/* Zoom Controls (Active in Canvas Mode) */}
-        {viewMode === 'canvas' && (
-          <div className="flex items-center gap-1 bg-slate-850 p-1 rounded-xl border border-slate-750 shadow-sm">
+        <div className="flex items-center gap-2">
+          {/* Quick Remix Button */}
+          {onRandomMix && (
             <button
               type="button"
-              onClick={() => setZoom((z) => Math.max(50, z - 15))}
-              className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-750 rounded-lg transition-colors cursor-pointer"
-              title="تصغير"
+              onClick={onRandomMix}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 rounded-xl text-xs font-black shadow-md shadow-amber-500/20 transition-all cursor-pointer transform active:scale-95 border border-amber-300/40"
+              title="توليد مزج عشوائي متناسق للألوان والخطوط والأيقونات والنصوص والمقاس"
             >
-              <ZoomOut className="w-3.5 h-3.5" />
+              <Dices className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>مزج عشوائي ✨</span>
             </button>
-            <button
-              type="button"
-              onClick={() => setZoom(100)}
-              className="text-[11px] font-bold text-slate-200 hover:text-amber-400 px-1.5 py-0.5 rounded transition-colors cursor-pointer"
-              title="إعادة للوضع الطبيعي 100%"
-            >
-              {zoom}%
-            </button>
-            <button
-              type="button"
-              onClick={() => setZoom((z) => Math.min(150, z + 15))}
-              className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-750 rounded-lg transition-colors cursor-pointer"
-              title="تكبير"
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        )}
+          )}
+
+          {/* Zoom Controls (Active in Canvas Mode) */}
+          {viewMode === 'canvas' && (
+            <div className="flex items-center gap-1 bg-slate-850 p-1 rounded-xl border border-slate-750 shadow-sm">
+              <button
+                type="button"
+                onClick={() => setZoom((z) => Math.max(50, z - 15))}
+                className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-750 rounded-lg transition-colors cursor-pointer"
+                title="تصغير"
+              >
+                <ZoomOut className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoom(100)}
+                className="text-[11px] font-bold text-slate-200 hover:text-amber-400 px-1.5 py-0.5 rounded transition-colors cursor-pointer"
+                title="إعادة للوضع الطبيعي 100%"
+              >
+                {zoom}%
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoom((z) => Math.min(150, z + 15))}
+                className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-750 rounded-lg transition-colors cursor-pointer"
+                title="تكبير"
+              >
+                <ZoomIn className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
 
       </div>
 

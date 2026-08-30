@@ -3,7 +3,7 @@ import { Header } from './components/Header';
 import { ControlsPanel } from './components/ControlsPanel';
 import { PreviewPanel } from './components/PreviewPanel';
 import { PosterConfig, PosterFormat } from './types';
-import { BUSINESS_PRESETS, THEME_PRESETS } from './presets';
+import { BUSINESS_PRESETS, THEME_PRESETS, generateRandomMix } from './presets';
 import { generateHighResBlob } from './utils/canvasRenderer';
 import confetti from 'canvas-confetti';
 import { 
@@ -13,7 +13,8 @@ import {
   Info, 
   ExternalLink,
   CheckCircle2,
-  Share2
+  Share2,
+  Dices
 } from 'lucide-react';
 
 const INITIAL_CONFIG: PosterConfig = {
@@ -120,6 +121,11 @@ export default function App() {
     setConfig((prev) => ({ ...prev, format }));
   };
 
+  // Random Mix Trigger
+  const handleRandomMix = () => {
+    setConfig((prev) => generateRandomMix(prev));
+  };
+
   // Download High-Res Trigger
   const handleDownloadHighRes = async () => {
     try {
@@ -158,6 +164,7 @@ export default function App() {
       <Header
         onSelectPreset={handleSelectPreset}
         onReset={handleReset}
+        onRandomMix={handleRandomMix}
         onDownloadHighRes={handleDownloadHighRes}
         onPrint={handlePrint}
         config={config}
@@ -192,13 +199,24 @@ export default function App() {
               </div>
             </div>
 
-            <button
-              onClick={() => setShowTips(!showTips)}
-              className="text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-3.5 py-2 rounded-xl border border-amber-500/30 transition-all flex items-center gap-2 shrink-0 cursor-pointer shadow-sm"
-            >
-              <Info className="w-4 h-4" />
-              <span>دليل استخراج الرابط</span>
-            </button>
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <button
+                onClick={handleRandomMix}
+                className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-lg shadow-amber-500/20 active:scale-95"
+                title="مزج عشوائي لكافة التصاميم والألوان والخطوط والأيقونات"
+              >
+                <Dices className="w-4 h-4 text-amber-950" />
+                <span>مزج عشوائي ✨</span>
+              </button>
+
+              <button
+                onClick={() => setShowTips(!showTips)}
+                className="text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-3 py-2 rounded-xl border border-amber-500/30 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm"
+              >
+                <Info className="w-4 h-4" />
+                <span>دليل الرابط</span>
+              </button>
+            </div>
           </div>
 
           {/* Bento Card 2: Quick Business Metric / Preview Badge (4 cols) */}
@@ -250,6 +268,7 @@ export default function App() {
               config={config}
               onChange={setConfig}
               onApplyPreset={handleSelectPreset}
+              onRandomMix={handleRandomMix}
             />
           </div>
 
@@ -259,6 +278,7 @@ export default function App() {
               config={config}
               onChangeFormat={handleChangeFormat}
               onChangeConfig={setConfig}
+              onRandomMix={handleRandomMix}
               isRendering={isRendering}
               setIsRendering={setIsRendering}
             />

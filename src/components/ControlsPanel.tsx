@@ -48,6 +48,7 @@ import {
   Plane,
   Camera,
   Music,
+  Dices,
   Home,
   Key,
   Gift,
@@ -125,6 +126,7 @@ interface ControlsPanelProps {
   config: PosterConfig;
   onChange: (updater: (prev: PosterConfig) => PosterConfig) => void;
   onApplyPreset: (presetId: string) => void;
+  onRandomMix?: () => void;
 }
 
 type TabKey = 'business' | 'texts' | 'qr' | 'logo' | 'theme' | 'footer';
@@ -132,7 +134,8 @@ type TabKey = 'business' | 'texts' | 'qr' | 'logo' | 'theme' | 'footer';
 export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   config,
   onChange,
-  onApplyPreset
+  onApplyPreset,
+  onRandomMix
 }) => {
   const [activeTab, setActiveTab] = useState<TabKey>('business');
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -205,8 +208,29 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
         })}
       </div>
 
+      {/* Magic Remix Button */}
+      {onRandomMix && (
+        <div className="px-5 pt-3 pb-0">
+          <button
+            type="button"
+            onClick={onRandomMix}
+            className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-500/15 via-amber-400/25 to-amber-500/15 hover:from-amber-500/30 hover:to-amber-500/30 border border-amber-500/40 hover:border-amber-400/70 rounded-2xl flex items-center justify-between text-amber-300 font-extrabold text-xs transition-all shadow-sm cursor-pointer group"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <Dices className="w-3.5 h-3.5 stroke-[2.5]" />
+              </div>
+              <span className="text-slate-100">مزج عشوائي لكافة الألوان والخطوط والأيقونات</span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black group-hover:bg-amber-400">
+              توليد فوري ✨
+            </span>
+          </button>
+        </div>
+      )}
+
       {/* Quick QR Upload Banner (Always Visible for Instant Access) */}
-      <div className="px-5 pt-4 pb-0">
+      <div className="px-5 pt-3 pb-0">
         <input
           type="file"
           id="quick-qr-upload-input"

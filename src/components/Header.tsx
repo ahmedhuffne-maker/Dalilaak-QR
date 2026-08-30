@@ -6,7 +6,8 @@ import {
   RotateCcw, 
   Share2, 
   Check, 
-  Layers
+  Layers,
+  Dices
 } from 'lucide-react';
 import { BUSINESS_PRESETS } from '../presets';
 import { PosterConfig } from '../types';
@@ -14,6 +15,7 @@ import { PosterConfig } from '../types';
 interface HeaderProps {
   onSelectPreset: (presetId: string) => void;
   onReset: () => void;
+  onRandomMix?: () => void;
   onDownloadHighRes: () => void;
   onPrint: () => void;
   config: PosterConfig;
@@ -23,6 +25,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   onSelectPreset,
   onReset,
+  onRandomMix,
   onDownloadHighRes,
   onPrint,
   config,
@@ -82,6 +85,19 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Quick Presets & Bento Actions */}
           <div className="flex items-center gap-2 flex-wrap w-full md:w-auto justify-end">
             
+            {/* Random Mix Button */}
+            {onRandomMix && (
+              <button
+                id="header-random-mix-btn"
+                onClick={onRandomMix}
+                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-xs py-2 px-3.5 rounded-xl shadow-lg shadow-amber-500/25 transition-all cursor-pointer transform active:scale-95 border border-amber-300/40"
+                title="توليد مزج عشوائي متناسق لكل من الألوان، الخطوط، الأيقونات، النصوص والمقاس"
+              >
+                <Dices className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+                <span>مزج عشوائي ✨</span>
+              </button>
+            )}
+
             {/* Quick Preset Selector */}
             <div className="relative inline-flex items-center">
               <select

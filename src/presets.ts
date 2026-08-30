@@ -1,4 +1,4 @@
-import { BusinessPreset, ThemePreset } from './types';
+import { BusinessPreset, ThemePreset, PosterConfig, PosterFormat, FontChoice } from './types';
 
 export const BUSINESS_PRESETS: BusinessPreset[] = [
   {
@@ -394,3 +394,95 @@ export const AVAILABLE_ICONS = [
   { id: 'BadgeCheck', label: 'معتمد وجودة' },
   { id: 'Smartphone', label: 'جوال وتطبيقات ذكية' }
 ];
+
+export function generateRandomMix(currentConfig: PosterConfig): PosterConfig {
+  // 1. Random Theme
+  const randomTheme = THEME_PRESETS[Math.floor(Math.random() * THEME_PRESETS.length)];
+
+  // 2. Random Font
+  const fonts: FontChoice[] = ['Cairo', 'Tajawal', 'Readex Pro', 'Amiri', 'Aref Ruqaa'];
+  const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
+
+  // 3. Random Format
+  const formats: PosterFormat[] = ['a4', 'a4_landscape', 'a4_quad', 'a5', 'square', 'badge', 'a3', 'a3_quad', 'a3_landscape'];
+  const randomFormat = formats[Math.floor(Math.random() * formats.length)];
+
+  // 4. Random CTA text from suggestions
+  const randomCta = CTA_SUGGESTIONS[Math.floor(Math.random() * CTA_SUGGESTIONS.length)];
+
+  // 5. Random Icon from AVAILABLE_ICONS
+  const randomIcon = AVAILABLE_ICONS[Math.floor(Math.random() * AVAILABLE_ICONS.length)].id;
+
+  // 6. Random Stars
+  const randomStars = Math.random() > 0.15 ? 5 : 4;
+
+  // 7. Random toggles
+  const randomNfc = Math.random() > 0.5;
+  const randomGoogleBadge = Math.random() > 0.55;
+  const randomMapPin = Math.random() > 0.65;
+
+  // 8. Random border style
+  const borderStyles: PosterConfig['borderStyle'][] = ['none', 'thin-gold', 'double-frame', 'ornament-corners', 'modern-dashed'];
+  const randomBorderStyle = borderStyles[Math.floor(Math.random() * borderStyles.length)];
+
+  // 9. Random texture
+  const textures: PosterConfig['bgTexture'][] = ['paper', 'clean', 'gradient', 'dots', 'noise'];
+  const randomTexture = textures[Math.floor(Math.random() * textures.length)];
+
+  // 10. Random phone / WhatsApp icons toggle
+  const randomShowWa = Math.random() > 0.25;
+  const randomShowPh = Math.random() > 0.35;
+
+  return {
+    ...currentConfig,
+
+    // PRESERVED STRICTLY: Business name, subtitle, activity number, phone, QR & center logo
+    businessName: currentConfig.businessName,
+    businessSubtitle: currentConfig.businessSubtitle,
+    activityNumber: currentConfig.activityNumber,
+    activityNumberLabel: currentConfig.activityNumberLabel,
+    footerPhone: currentConfig.footerPhone,
+    footerWhatsApp: currentConfig.footerWhatsApp,
+    qrUrl: currentConfig.qrUrl,
+    uploadedQrDataUrl: currentConfig.uploadedQrDataUrl,
+    qrColor: currentConfig.qrColor,
+    qrBgColor: currentConfig.qrBgColor,
+    qrLogoCenter: currentConfig.qrLogoCenter,
+    qrCenterLogoType: currentConfig.qrCenterLogoType,
+    showFooter: currentConfig.showFooter,
+    showDalilakBranding: currentConfig.showDalilakBranding,
+    dalilakText: currentConfig.dalilakText,
+    dalilakSubtext: currentConfig.dalilakSubtext,
+    footerWebsite: currentConfig.footerWebsite,
+
+    // SHUFFLED / REMIXED ATTRIBUTES:
+    mainText: randomCta,
+    starCount: randomStars,
+    themeId: randomTheme.id,
+    bgColor: randomTheme.bgColor,
+    bgTexture: randomTexture,
+    textColor: randomTheme.textColor,
+    accentColor: randomTheme.accentColor,
+    footerBgColor: randomTheme.footerBgColor,
+    footerTextColor: randomTheme.footerTextColor,
+    footerAccentColor: randomTheme.footerAccentColor,
+    borderStyle: randomBorderStyle,
+    fontFamily: randomFont,
+    format: randomFormat,
+    
+    // Icon (shuffled unless user uploaded custom logo)
+    logoType: currentConfig.logoType === 'upload' && currentConfig.uploadedLogoDataUrl ? 'upload' : 'icon',
+    selectedIcon: randomIcon,
+    logoScale: 1.0 + Math.floor(Math.random() * 3) * 0.1,
+
+    // Badges & Features
+    showNfcBadge: randomNfc,
+    showGoogleBadge: randomGoogleBadge,
+    showMapPinBadge: randomMapPin,
+
+    // Activity number icons presence
+    activityShowWhatsAppIcon: randomShowWa,
+    activityShowPhoneIcon: randomShowPh,
+    showActivityNumber: !!currentConfig.activityNumber
+  };
+}
