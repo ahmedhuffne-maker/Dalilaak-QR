@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dalilak-qr-pwa-v1';
+const CACHE_NAME = 'dalilak-qr-pwa-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -9,13 +9,6 @@ const STATIC_ASSETS = [
 
 // Install Event
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.warn('SW pre-cache error:', err);
-      });
-    })
-  );
   self.skipWaiting();
 });
 
