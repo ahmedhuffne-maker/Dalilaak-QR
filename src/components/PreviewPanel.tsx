@@ -41,7 +41,6 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   setIsRendering
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const qrFileInputRef = useRef<HTMLInputElement>(null);
   const [viewMode, setViewMode] = useState<'canvas' | 'mockup'>('canvas');
   const [zoom, setZoom] = useState<number>(100);
   const [copied, setCopied] = useState(false);
@@ -221,21 +220,6 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
     }
   };
 
-  const handleQrFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && onChangeConfig) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        onChangeConfig((prev) => ({
-          ...prev,
-          qrType: 'uploaded',
-          uploadedQrDataUrl: event.target?.result as string
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleDropFile = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -290,58 +274,43 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Quick Remix Button */}
-          {onRandomMix && (
+        {/* Zoom Controls (Active in Canvas Mode) */}
+        {viewMode === 'canvas' && (
+          <div className="flex items-center gap-1 bg-slate-850 p-1 rounded-xl border border-slate-750 shadow-sm min-h-[36px]">
             <button
               type="button"
-              onClick={onRandomMix}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 rounded-xl text-xs font-black shadow-md shadow-amber-500/20 transition-all cursor-pointer transform active:scale-95 border border-amber-300/40 min-h-[36px]"
-              title="توليد مزج عشوائي متناسق"
+              onClick={() => setZoom((z) => Math.max(40, z - 15))}
+              className="p-1 text-slate-400 hover:text-slate-100 hover:bg-slate-750 rounded-lg transition-colors cursor-pointer"
+              title="تصغير"
             >
-              <Dices className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>مزج ✨</span>
+              <ZoomOut className="w-3.5 h-3.5" />
             </button>
-          )}
-
-          {/* Zoom Controls (Active in Canvas Mode) */}
-          {viewMode === 'canvas' && (
-            <div className="flex items-center gap-1 bg-slate-850 p-1 rounded-xl border border-slate-750 shadow-sm min-h-[36px]">
-              <button
-                type="button"
-                onClick={() => setZoom((z) => Math.max(40, z - 15))}
-                className="p-1 text-slate-400 hover:text-slate-100 hover:bg-slate-750 rounded-lg transition-colors cursor-pointer"
-                title="تصغير"
-              >
-                <ZoomOut className="w-3.5 h-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setZoom(100)}
-                className="text-[11px] font-bold text-slate-200 hover:text-amber-400 px-1 py-0.5 rounded transition-colors cursor-pointer"
-                title="100%"
-              >
-                {zoom}%
-              </button>
-              <button
-                type="button"
-                onClick={() => setZoom((z) => Math.min(150, z + 15))}
-                className="p-1 text-slate-400 hover:text-slate-100 hover:bg-slate-750 rounded-lg transition-colors cursor-pointer"
-                title="تكبير"
-              >
-                <ZoomIn className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
-        </div>
+            <button
+              type="button"
+              onClick={() => setZoom(100)}
+              className="text-[11px] font-bold text-slate-200 hover:text-amber-400 px-1 py-0.5 rounded transition-colors cursor-pointer"
+              title="100%"
+            >
+              {zoom}%
+            </button>
+            <button
+              type="button"
+              onClick={() => setZoom((z) => Math.min(150, z + 15))}
+              className="p-1 text-slate-400 hover:text-slate-100 hover:bg-slate-750 rounded-lg transition-colors cursor-pointer"
+              title="تكبير"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
       </div>
 
       {/* Dedicated Formats Bar: Mobile Scrollable & Touch-Friendly */}
-      <div className="px-3 sm:px-4 py-2.5 bg-slate-950/50 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300 shrink-0">
+      <div className="px-3 sm:px-4 py-2 bg-slate-950/60 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 shrink-0">
           <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
-          <span className="hidden sm:inline">مقاس القالب:</span>
+          <span className="hidden sm:inline">المقاس:</span>
         </div>
 
         <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
@@ -352,7 +321,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                 key={fmt.id}
                 type="button"
                 onClick={() => onChangeFormat(fmt.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 border min-h-[34px] ${
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 border min-h-[32px] ${
                   isSelected
                     ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-sm ring-1 ring-amber-500/40 font-black'
                     : 'bg-slate-850 hover:bg-slate-800 text-slate-300 border-slate-750 hover:border-slate-650'
@@ -366,81 +335,6 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
           })}
         </div>
       </div>
-
-      {/* Hidden File Input for Preview QR Upload */}
-      <input
-        ref={qrFileInputRef}
-        type="file"
-        onChange={handleQrFileUpload}
-        accept="image/*"
-        className="hidden"
-      />
-
-      {/* Interactive Quick QR Code Upload Bar */}
-      {onChangeConfig && (
-        <div className="px-3 sm:px-4 py-2.5 bg-slate-950/70 border-b border-slate-800/70 flex items-center justify-between gap-3 text-right">
-          {config.uploadedQrDataUrl ? (
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1 bg-white rounded-lg shadow shrink-0">
-                  <img
-                    src={config.uploadedQrDataUrl}
-                    alt="QR"
-                    className="w-7 h-7 object-contain rounded"
-                  />
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                    <Check className="w-3 h-3" />
-                    تم دمج رمز QR المخصص
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => qrFileInputRef.current?.click()}
-                  className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg border border-slate-700 transition-colors cursor-pointer min-h-[32px]"
-                >
-                  استبدال
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onChangeConfig((p) => ({ ...p, uploadedQrDataUrl: null, qrType: 'generated' }))}
-                  className="p-1 text-rose-400 hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer min-h-[32px] min-w-[32px] flex items-center justify-center"
-                  title="حذف والرجوع للتلقائي"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div 
-              onClick={() => qrFileInputRef.current?.click()}
-              className="flex items-center justify-between w-full cursor-pointer group hover:bg-slate-900/60 p-1 rounded-xl transition-all"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
-                  <QrCode className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-amber-300 transition-colors">
-                    رفع كود QR مخصص للدمج الفوري
-                  </span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-lg shadow-sm transition-transform group-hover:scale-105 cursor-pointer shrink-0"
-              >
-                + رفع الكود
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Canvas / Mockup Display Stage with Drag-and-Drop */}
       <div 

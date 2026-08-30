@@ -203,90 +203,12 @@ export default function App() {
         isRendering={isRendering}
       />
 
-      {/* Main Workspace with Bento Grid Architecture */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-8 flex flex-col gap-4 sm:gap-6">
+      {/* Main Studio Workspace */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 lg:p-6 flex flex-col gap-4">
         
-        {/* Bento Top Highlights Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4">
-          
-          {/* Bento Card 1: Official Dalilak Verification & Live Status */}
-          <div className="md:col-span-8 bg-slate-900/80 backdrop-blur-md border border-slate-800/90 rounded-2xl p-3.5 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 shadow-xl hover:border-slate-700/80 transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-inner">
-                <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-xs sm:text-sm font-bold text-slate-100">
-                    منظومة دليلك المعتمدة لتوثيق وتقييمات خرائط Google
-                  </h2>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    نظام نشط
-                  </span>
-                </div>
-                <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 sm:mt-1 leading-relaxed line-clamp-2 sm:line-clamp-none">
-                  صمّم ملصق أو ستاند طاولة احترافي لعملائك لزيادة تقييمات الـ 5 نجوم والتفاعل الفوري عبر مسح الكاميرا
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-              <button
-                onClick={() => setIsDalilakModalOpen(true)}
-                className="flex-1 sm:flex-initial text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-md shadow-emerald-500/20 active:scale-95 min-h-[38px] border border-emerald-400/30"
-                title="استعراض الأنشطة المسجلة لحظياً في دليلك"
-              >
-                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping shrink-0" />
-                <span>📥 أنشطة دليلك</span>
-              </button>
-
-              <button
-                onClick={handleRandomMix}
-                className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 px-3 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-md shadow-amber-500/20 active:scale-95 min-h-[38px]"
-                title="مزج عشوائي متناسق لكافة التصاميم والألوان والخطوط والأيقونات"
-              >
-                <Dices className="w-4 h-4 text-amber-950" />
-                <span className="hidden sm:inline">مزج ✨</span>
-              </button>
-
-              <button
-                onClick={() => setShowTips(!showTips)}
-                className="text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-2 rounded-xl border border-amber-500/30 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm min-h-[38px]"
-              >
-                <Info className="w-4 h-4" />
-                <span className="hidden sm:inline">دليل</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Bento Card 2: Quick Business Metric & Status */}
-          <div className="md:col-span-4 bg-slate-900/80 backdrop-blur-md border border-slate-800/90 rounded-2xl p-3.5 sm:p-5 flex items-center justify-between shadow-xl hover:border-slate-700/80 transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400 font-bold text-sm">
-                ★ 5.0
-              </div>
-              <div className="overflow-hidden">
-                <span className="block text-xs sm:text-sm font-bold text-slate-200 truncate max-w-[160px]">
-                  {config.businessName || 'اسم نشاطك'}
-                </span>
-                <span className="block text-[11px] text-slate-400 truncate max-w-[160px]">
-                  {config.category || 'نشاط تجاري'} • {config.format.toUpperCase()}
-                </span>
-              </div>
-            </div>
-            <div className="text-left shrink-0">
-              <span className="text-[10px] font-black uppercase tracking-wider text-amber-400/90 px-2 py-1 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                جاهز للطباعة
-              </span>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Google Review Tips Bento Tile (Collapsible) */}
+        {/* Google Review Tips (Collapsible when requested from tips button) */}
         {showTips && (
-          <div className="bg-slate-900/90 backdrop-blur-md border border-amber-500/30 rounded-2xl p-4 sm:p-5 text-right space-y-3 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="bg-slate-900/95 backdrop-blur-md border border-amber-500/40 rounded-2xl p-4 sm:p-5 text-right space-y-3 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
             <h3 className="text-xs sm:text-sm font-bold text-amber-400 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               خطوات استخراج رابط تقييم Google Maps المباشر لنشاطك التجاري:
@@ -300,7 +222,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Mobile View Mode Switcher Header (Visible on screens < lg) */}
+        {/* Mobile View Switcher (Visible only on mobile) */}
         <div className="lg:hidden flex bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-lg sticky top-[57px] z-30 backdrop-blur-xl">
           <button
             type="button"
@@ -330,16 +252,17 @@ export default function App() {
           </button>
         </div>
 
-        {/* 2-Column Bento Grid Workspace */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* 2-Column Professional Studio Workspace */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           
-          {/* Left Column (5 Cols): Bento Configuration Box */}
+          {/* Controls Column (5 Cols) */}
           <div className={`lg:col-span-5 w-full ${mobileActiveView === 'controls' ? 'block' : 'hidden lg:block'}`}>
             <ControlsPanel
               config={config}
               onChange={setConfig}
               onApplyPreset={handleSelectPreset}
               onRandomMix={handleRandomMix}
+              onOpenDalilakModal={() => setIsDalilakModalOpen(true)}
             />
           </div>
 

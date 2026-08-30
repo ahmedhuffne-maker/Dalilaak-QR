@@ -6,11 +6,10 @@ import {
   RotateCcw, 
   Share2, 
   Check, 
-  Layers,
   Dices,
-  Wand2
+  Building2,
+  FileDown
 } from 'lucide-react';
-import { BUSINESS_PRESETS } from '../presets';
 import { PosterConfig } from '../types';
 
 interface HeaderProps {
@@ -51,135 +50,114 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="bg-slate-900/90 backdrop-blur-xl border-b border-slate-800/90 sticky top-0 z-40 shadow-xl shadow-black/30">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
+    <header className="bg-slate-900/95 backdrop-blur-2xl border-b border-slate-800/80 sticky top-0 z-40 shadow-2xl shadow-black/40">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-2.5">
+        <div className="flex items-center justify-between gap-2 sm:gap-4">
           
-          {/* Logo & Title Tile */}
-          <div className="flex items-center justify-between w-full md:w-auto gap-3">
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center shadow-lg shadow-amber-500/25 ring-2 ring-amber-400/40 shrink-0">
-                <Sparkles className="w-5 h-5 text-slate-950 stroke-[2.5]" />
+          {/* Right: Brand & App Title */}
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-400 to-amber-300 flex items-center justify-center shadow-lg shadow-amber-500/25 ring-2 ring-amber-400/30 shrink-0">
+              <Sparkles className="w-5 h-5 text-slate-950 stroke-[2.5]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h1 className="text-sm sm:text-base font-black tracking-tight text-white font-['Cairo',sans-serif]">
+                  صانع ملصقات التقييم
+                </h1>
+                <span className="text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 hidden sm:inline-flex">
+                  دليلك المعتمد
+                </span>
               </div>
-              <div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <h1 className="text-base sm:text-lg font-black tracking-tight text-white font-['Cairo',sans-serif]">
-                    صانع ملصقات التقييم
-                  </h1>
-                  <span className="text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                    دليلك المعتمد
-                  </span>
-                </div>
-                <p className="text-[11px] sm:text-xs text-slate-400 font-medium line-clamp-1">
-                  تصميم ستاندات وملصقات تقييم خرائط Google بمسح مباشر
-                </p>
-              </div>
+              <p className="text-[10px] sm:text-xs text-slate-400 font-medium hidden md:block">
+                تصميم ملصقات وستاندات تقييم خرائط Google بجودة طباعة فائقة
+              </p>
             </div>
 
-            {/* Live Render indicator for mobile */}
+            {/* Live Render indicator */}
             {isRendering && (
-              <div className="md:hidden flex items-center gap-1.5 text-[10px] text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/30 shrink-0">
+              <div className="flex items-center gap-1 text-[10px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30 shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
                 رسم...
               </div>
             )}
           </div>
 
-          {/* Quick Presets & Bento Actions - Mobile Scrollable */}
-          <div className="flex items-center gap-1.5 sm:gap-2 w-full md:w-auto justify-between md:justify-end overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+          {/* Left: Clean, High-Contrast Action Bar */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
             
-            {/* Dalilak Live Activities Explorer Button */}
+            {/* Primary Action 1: Dalilak Live Activities Modal Trigger */}
             {onOpenDalilakModal && (
               <button
                 id="header-dalilak-activities-btn"
                 onClick={onOpenDalilakModal}
-                className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-700 hover:from-emerald-400 hover:to-emerald-600 text-white font-bold text-xs py-2 px-2.5 sm:px-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer transform active:scale-95 border border-emerald-400/40 min-h-[38px] shrink-0"
+                className="inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-xs sm:text-sm py-2 px-3 sm:px-4 rounded-xl shadow-lg shadow-emerald-500/25 transition-all cursor-pointer transform active:scale-95 border border-emerald-300/40 min-h-[38px] shrink-0"
                 title="استيراد وتوليد ملصق من أنشطة دليلك المسجلة لحظياً"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping shrink-0" />
-                <span>📥 أنشطة دليلك</span>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-200"></span>
+                </span>
+                <Building2 className="w-4 h-4 text-white" />
+                <span className="font-['Cairo',sans-serif]">أنشطة دليلك</span>
               </button>
             )}
 
-            {/* Quick Preset Selector */}
-            <div className="relative inline-flex items-center flex-1 sm:flex-initial min-w-[130px] max-w-[190px]">
-              <select
-                id="quick-preset-select"
-                aria-label="اختر نشاط تجاري جاهز"
-                onChange={(e) => {
-                  if (e.target.value) onSelectPreset(e.target.value);
-                }}
-                defaultValue=""
-                className="w-full bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold py-2 px-2.5 pl-7 rounded-xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer transition-all appearance-none shadow-sm min-h-[38px] truncate"
-              >
-                <option value="" disabled>✨ أنشطة جاهزة...</option>
-                {BUSINESS_PRESETS.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute left-2 pointer-events-none text-slate-400">
-                <Layers className="w-3.5 h-3.5" />
-              </div>
-            </div>
-
-            {/* Random Mix Button */}
+            {/* Primary Action 2: Intelligent Random Mix */}
             {onRandomMix && (
               <button
                 id="header-random-mix-btn"
                 onClick={onRandomMix}
-                className="inline-flex items-center justify-center gap-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-xs py-2 px-2.5 sm:px-3 rounded-xl shadow-md shadow-amber-500/25 transition-all cursor-pointer transform active:scale-95 border border-amber-300/40 min-h-[38px] shrink-0"
-                title="توليد مزج عشوائي متناسق"
+                className="inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-750 text-amber-400 hover:text-amber-300 font-bold text-xs py-2 px-2.5 sm:px-3 rounded-xl border border-slate-700 hover:border-amber-500/40 transition-all cursor-pointer transform active:scale-95 min-h-[38px] shrink-0"
+                title="مزج عشوائي متناسق للتصميم والخطوط والألوان"
               >
-                <Dices className="w-3.5 h-3.5 text-slate-950 stroke-[2.5]" />
-                <span className="hidden sm:inline">مزج ✨</span>
+                <Dices className="w-3.5 h-3.5 text-amber-400 stroke-[2.5]" />
+                <span className="hidden sm:inline">مزج ذكي ✨</span>
               </button>
             )}
 
-            {/* Direct Print Button */}
+            {/* Primary Action 3: Direct Print */}
             <button
               id="header-print-btn"
               onClick={onPrint}
-              className="inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold py-2 px-2.5 sm:px-3 rounded-xl border border-slate-700 transition-all shadow-sm cursor-pointer min-h-[38px] shrink-0"
-              title="طباعة مباشرة"
+              className="inline-flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-bold py-2 px-2.5 sm:px-3 rounded-xl border border-slate-700 transition-all shadow-sm cursor-pointer min-h-[38px] shrink-0"
+              title="طباعة مباشرة بجودة عالية"
             >
               <Printer className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden lg:inline">طباعة</span>
+              <span className="hidden md:inline">طباعة</span>
             </button>
 
-            {/* Quick Download High-Res */}
+            {/* Primary Action 4: Download High-Res PNG */}
             <button
               id="header-download-btn"
               onClick={onDownloadHighRes}
-              className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs py-2 px-3 sm:px-4 rounded-xl shadow-md shadow-amber-500/20 transition-all cursor-pointer active:scale-95 min-h-[38px] shrink-0"
+              className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs sm:text-sm py-2 px-3 sm:px-4 rounded-xl shadow-lg shadow-amber-500/25 transition-all cursor-pointer transform active:scale-95 min-h-[38px] shrink-0 font-['Cairo',sans-serif]"
+              title="تصدير وتحميل الملصق كصورة عالية الدقة"
             >
-              <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>تحميل</span>
+              <Download className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+              <span>تحميل الملصق</span>
             </button>
 
-            {/* Reset */}
+            {/* Action 5: Reset */}
             <button
               id="header-reset-btn"
               onClick={onReset}
-              className="p-2 text-slate-400 hover:text-slate-200 bg-slate-800 hover:bg-slate-750 rounded-xl border border-slate-700 transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center shrink-0"
-              title="إعادة ضبط الإعدادات"
+              className="p-2 text-slate-400 hover:text-slate-200 bg-slate-800/80 hover:bg-slate-750 rounded-xl border border-slate-700/80 transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center shrink-0"
+              title="إعادة ضبط التصميم"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
 
-            {/* Share */}
+            {/* Action 6: Share */}
             <button
               id="header-share-btn"
               onClick={handleShareApp}
-              className="p-2 text-slate-400 hover:text-slate-200 bg-slate-800 hover:bg-slate-750 rounded-xl border border-slate-700 transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center shrink-0"
-              title="مشاركة الأداة"
+              className="p-2 text-slate-400 hover:text-slate-200 bg-slate-800/80 hover:bg-slate-750 rounded-xl border border-slate-700/80 transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center shrink-0 hidden sm:flex"
+              title="مشاركة التطبيق"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
             </button>
 
           </div>
-
         </div>
       </div>
     </header>

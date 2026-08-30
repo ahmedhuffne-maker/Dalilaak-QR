@@ -136,6 +136,7 @@ interface ControlsPanelProps {
   onChange: (updater: (prev: PosterConfig) => PosterConfig) => void;
   onApplyPreset: (presetId: string) => void;
   onRandomMix?: () => void;
+  onOpenDalilakModal?: () => void;
 }
 
 type TabKey = 'business' | 'texts' | 'qr' | 'logo' | 'theme' | 'footer';
@@ -144,7 +145,8 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   config,
   onChange,
   onApplyPreset,
-  onRandomMix
+  onRandomMix,
+  onOpenDalilakModal
 }) => {
   const [activeTab, setActiveTab] = useState<TabKey>('business');
   const [showAiSuccessToast, setShowAiSuccessToast] = useState(false);
@@ -225,10 +227,10 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   };
 
   return (
-    <div className="bg-slate-900/85 backdrop-blur-xl rounded-3xl border border-slate-800/90 shadow-2xl flex flex-col h-full overflow-hidden">
+    <div className="bg-slate-900/90 backdrop-blur-xl rounded-3xl border border-slate-800 shadow-2xl flex flex-col h-full overflow-hidden">
       
-      {/* Bento Navigation Tabs Header - Mobile Scrollable & Touch-Optimized */}
-      <div className="flex border-b border-slate-800/80 bg-slate-950/50 p-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 gap-1.5 touch-pan-x">
+      {/* Navigation Tabs Header */}
+      <div className="flex border-b border-slate-800/80 bg-slate-950/60 p-2 overflow-x-auto scrollbar-none gap-1.5 touch-pan-x">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -237,7 +239,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               key={tab.key}
               id={`tab-${tab.key}`}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-xs font-bold whitespace-nowrap transition-all flex-1 justify-center cursor-pointer min-h-[44px] active:scale-95 ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex-1 justify-center cursor-pointer min-h-[42px] active:scale-95 ${
                 isActive
                   ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 ring-1 ring-amber-400/60 font-black'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/70 bg-slate-900/40'
@@ -260,128 +262,43 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
         </div>
       )}
 
-      {/* Magic AI Text Generator Banner */}
-      <div className="px-4 sm:px-5 pt-3 pb-0">
-        <div className="p-3 bg-gradient-to-r from-amber-500/15 via-slate-850 to-slate-900 border border-amber-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-sm">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 shadow-md shadow-amber-500/20 shrink-0">
-              <Bot className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-black text-slate-100">
-                  توليد النصوص بالذكاء الاصطناعي ✨
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  {config.category || smartAnalysis.detectedCategory.name}
-                </span>
-              </div>
-              <span className="text-[11px] text-slate-400 block mt-0.5">
-                توليد عبارات تقييم دعائية ذكية حسب تصنيف نشاطك
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 self-end sm:self-auto">
-            <button
-              type="button"
-              onClick={() => setIsAiModalOpen(true)}
-              className="px-3.5 py-2 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-md shadow-amber-500/20 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shrink-0 min-h-[38px]"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>توليد ذكي 🤖</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleApplyFullSmartPack}
-              className="px-3 py-2 bg-slate-800 hover:bg-slate-750 text-amber-400 border border-amber-500/30 text-xs font-bold rounded-xl transition-all active:scale-95 cursor-pointer flex items-center gap-1 shrink-0 min-h-[38px]"
-              title="تطبيق تلقائي فوري للألوان والنصوص"
-            >
-              <Wand2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">حزمة فورية</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick QR Upload Banner (Always Visible for Instant Access) */}
-      <div className="px-4 sm:px-5 pt-3 pb-0">
-        <input
-          type="file"
-          id="quick-qr-upload-input"
-          onChange={handleQrUpload}
-          accept="image/*"
-          className="hidden"
-        />
-        {config.uploadedQrDataUrl ? (
-          <div className="p-3 bg-gradient-to-r from-emerald-950/60 to-slate-900 border border-emerald-500/40 rounded-2xl flex items-center justify-between shadow-md">
-            <div className="flex items-center gap-3">
-              <div className="p-1 bg-white rounded-lg shrink-0">
-                <img
-                  src={config.uploadedQrDataUrl}
-                  alt="QR"
-                  className="w-10 h-10 object-contain rounded"
-                />
-              </div>
-              <div className="text-right">
-                <span className="block text-xs font-extrabold text-emerald-300">
-                  تم دمج كود الـ QR المخصص في التصميم ✓
-                </span>
-                <span className="block text-[11px] text-slate-400">
-                  معروض الآن في الملصق بدقة عالية
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => document.getElementById('quick-qr-upload-input')?.click()}
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-bold rounded-xl border border-slate-650 transition-colors cursor-pointer min-h-[36px]"
-              >
-                تغيير
-              </button>
-              <button
-                type="button"
-                onClick={() => onChange((p) => ({ ...p, uploadedQrDataUrl: null, qrType: 'generated' }))}
-                className="p-2 text-rose-400 hover:bg-rose-500/20 rounded-xl transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
-                title="استعادة الـ QR التلقائي"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div
-            onClick={() => document.getElementById('quick-qr-upload-input')?.click()}
-            className="p-3 bg-gradient-to-r from-amber-500/10 via-slate-850 to-slate-900 border border-amber-500/30 hover:border-amber-400 rounded-2xl flex items-center justify-between cursor-pointer transition-all hover:shadow-lg group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <QrCode className="w-5 h-5 text-amber-400" />
-              </div>
-              <div className="text-right">
-                <span className="block text-xs font-extrabold text-slate-100 group-hover:text-amber-300 transition-colors">
-                  رفع كود QR Code مخصص لدمجه في الإعلان
-                </span>
-                <span className="block text-[11px] text-slate-400">
-                  اضغط هنا أو اسحب صورة الكود (PNG / JPG / WebP)
-                </span>
-              </div>
-            </div>
-            <div className="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-sm transition-all group-hover:translate-x-[-2px] shrink-0">
-              رفع الكود
-            </div>
-          </div>
-        )}
-      </div>
-
       {/* Main Tab Content */}
-      <div className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-5 text-right">
+      <div className="p-4 sm:p-5 flex-1 overflow-y-auto space-y-4 text-right">
         
         {/* ================= TAB 1: BUSINESS & PRESETS ================= */}
         {activeTab === 'business' && (
-          <div className="space-y-5">
+          <div className="space-y-4">
+
+            {/* Dalilak Live Activities Hero Card */}
+            {onOpenDalilakModal && (
+              <div 
+                onClick={onOpenDalilakModal}
+                className="p-3.5 bg-gradient-to-r from-emerald-950/80 via-slate-850 to-slate-900 border border-emerald-500/40 hover:border-emerald-400 rounded-2xl flex items-center justify-between cursor-pointer transition-all hover:shadow-lg shadow-emerald-500/10 group active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/25 shrink-0 group-hover:scale-105 transition-transform">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs sm:text-sm font-black text-white group-hover:text-emerald-300 transition-colors">
+                        استيراد نشاط من دليلك (Live) ⚡
+                      </span>
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    </div>
+                    <span className="text-[11px] text-slate-400 block mt-0.5">
+                      سحب فوري لبيانات المحل ورابط الخريطة وتوليد البوستر
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md transition-all shrink-0"
+                >
+                  استعراض
+                </button>
+              </div>
+            )}
             
             {/* Arabic Business Name */}
             <div>
