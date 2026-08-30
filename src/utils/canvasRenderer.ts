@@ -2378,27 +2378,40 @@ export async function renderPosterToCanvas(
       rightY += titleFontSize + 8;
     }
 
-    // Optional Activity Number / Business Code Badge
+    // Optional Large, Prominent Official Business/Activity Code Badge (No text label, pure bold styling)
     if (config.activityNumber && config.activityNumber.trim() !== '') {
-      const actLabel = config.activityNumberLabel || 'رقم النشاط';
-      const actText = `${actLabel}: ${config.activityNumber}`;
-      ctx.font = `bold 16px '${config.fontFamily}', Arial, sans-serif`;
-      const actMeasured = ctx.measureText(actText);
-      const pillW = actMeasured.width + 36;
-      const pillH = 30;
+      const cleanNum = config.activityNumber.trim();
+      const numFontSize = 24;
+      ctx.font = `900 ${numFontSize}px 'Outfit', 'Cairo', 'Tajawal', sans-serif`;
+      ctx.letterSpacing = '3px';
+      const actMeasured = ctx.measureText(cleanNum);
+      const pillW = Math.max(220, actMeasured.width + 52);
+      const pillH = 42;
       const pillX = rightColCenterX - pillW / 2;
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
-      ctx.strokeStyle = config.accentColor;
-      ctx.lineWidth = 1.8;
-      drawRoundRect(ctx, pillX, rightY, pillW, pillH, 15, true, true);
+      // Soft shadow for depth
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetY = 2;
 
-      ctx.fillStyle = config.textColor;
+      // Luxury Pill Background
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.strokeStyle = config.accentColor || '#e5a82e';
+      ctx.lineWidth = 2.4;
+      drawRoundRect(ctx, pillX, rightY, pillW, pillH, pillH / 2, true, true);
+
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Large crisp digits in center
+      ctx.fillStyle = config.textColor || '#0f172a';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(actText, rightColCenterX, rightY + pillH / 2);
+      ctx.fillText(cleanNum, rightColCenterX, rightY + pillH / 2 + 1);
+      ctx.letterSpacing = '0px';
 
-      rightY += pillH + 12;
+      rightY += pillH + 16;
     }
 
     // Logo / Category & Car Icon (Larger & Crisp)
@@ -2530,27 +2543,40 @@ export async function renderPosterToCanvas(
       currentY += titleFontSize + 8;
     }
 
-    // Optional Activity Number / Business Code Badge
+    // Optional Large, Prominent Official Business/Activity Code Badge (No text label, pure bold styling)
     if (config.activityNumber && config.activityNumber.trim() !== '') {
-      const actLabel = config.activityNumberLabel || 'رقم النشاط';
-      const actText = `${actLabel}: ${config.activityNumber}`;
-      ctx.font = `bold ${isSquare ? 15 : 17}px '${config.fontFamily}', Arial, sans-serif`;
-      const actMeasured = ctx.measureText(actText);
-      const pillW = actMeasured.width + 36;
-      const pillH = 32;
+      const cleanNum = config.activityNumber.trim();
+      const numFontSize = isSquare ? 23 : 26;
+      ctx.font = `900 ${numFontSize}px 'Outfit', 'Cairo', 'Tajawal', sans-serif`;
+      ctx.letterSpacing = '3px';
+      const actMeasured = ctx.measureText(cleanNum);
+      const pillW = Math.max(isSquare ? 200 : 250, actMeasured.width + 56);
+      const pillH = isSquare ? 40 : 46;
       const pillX = (baseWidth - pillW) / 2;
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
-      ctx.strokeStyle = config.accentColor;
-      ctx.lineWidth = 1.8;
-      drawRoundRect(ctx, pillX, currentY, pillW, pillH, 16, true, true);
+      // Soft shadow for depth
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.09)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 3;
 
-      ctx.fillStyle = config.textColor;
+      // Luxury Pill Background: semi-translucent crisp background with accent border
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.strokeStyle = config.accentColor || '#e5a82e';
+      ctx.lineWidth = 2.5;
+      drawRoundRect(ctx, pillX, currentY, pillW, pillH, pillH / 2, true, true);
+
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Large crisp digits in center
+      ctx.fillStyle = config.textColor || '#0f172a';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(actText, baseWidth / 2, currentY + pillH / 2);
+      ctx.fillText(cleanNum, baseWidth / 2, currentY + pillH / 2 + 1);
+      ctx.letterSpacing = '0px';
 
-      currentY += pillH + 14;
+      currentY += pillH + 18;
     }
 
     // Logo / Car Icon

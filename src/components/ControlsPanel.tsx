@@ -376,41 +376,22 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             </div>
 
             {/* Activity Number / Business Code (Always Visible & Optional) */}
-            <div className="p-3.5 bg-gradient-to-b from-slate-800/80 to-slate-850/80 border border-slate-700/80 rounded-2xl space-y-2.5">
+            <div className="p-3.5 bg-gradient-to-b from-slate-800/80 to-slate-850/80 border border-slate-700/80 rounded-2xl space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
                   <Hash className="w-3.5 h-3.5 text-amber-400" />
-                  رقم أو كود النشاط داخل الملصق (اختياري)
+                  رقم أو كود النشاط التجاري (اختياري)
                 </label>
-                <span className="text-[10px] text-slate-400">يظهر في الملصق فور كتابته</span>
+                <span className="text-[10px] text-slate-400">شارة رقمية بارزة وكبيرة</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                    الرقم أو كود النشاط
-                  </label>
-                  <input
-                    type="text"
-                    dir="ltr"
-                    value={config.activityNumber || ''}
-                    onChange={(e) => onChange((p) => ({ ...p, activityNumber: e.target.value, showActivityNumber: !!e.target.value }))}
-                    placeholder="مثال: #1042 أو 0501234567"
-                    className="w-full bg-slate-900 border border-slate-750 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono text-left font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                    تسمية الحقل
-                  </label>
-                  <input
-                    type="text"
-                    value={config.activityNumberLabel || 'رقم النشاط'}
-                    onChange={(e) => onChange((p) => ({ ...p, activityNumberLabel: e.target.value }))}
-                    placeholder="رقم النشاط"
-                    className="w-full bg-slate-900 border border-slate-750 focus:border-amber-500 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500 font-bold"
-                  />
-                </div>
-              </div>
+              <input
+                type="text"
+                dir="ltr"
+                value={config.activityNumber || ''}
+                onChange={(e) => onChange((p) => ({ ...p, activityNumber: e.target.value, showActivityNumber: !!e.target.value }))}
+                placeholder="مثال: 0114598874 أو #1042"
+                className="w-full bg-slate-900 border border-slate-750 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 font-mono text-left font-bold tracking-widest"
+              />
             </div>
 
             {/* Google Badge Top Toggle */}
