@@ -2071,6 +2071,14 @@ export async function renderPosterToCanvas(
   config: PosterConfig,
   scale = 1
 ): Promise<void> {
+  if (typeof document !== 'undefined' && document.fonts) {
+    try {
+      await document.fonts.ready;
+    } catch {
+      // ignore
+    }
+  }
+
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -2828,23 +2836,24 @@ export async function renderPosterToCanvas(
       // 2. Texts directly to the left of the icon
       const textEndX = badgeX - 16;
       const dalilakWord = config.dalilakText || 'دليلك';
+      const dalilakSub = config.dalilakSubtext || 'المنصة الشاملة لإدارة وتوثيق الأنشطة والخدمات الميدانية';
       const websiteText = config.footerWebsite || 'www.dalilaak.com';
 
-      // Top Line: "دليلك" (Gold 900)
+      // Top Line: "دليلك" (Fixed Official Brand Font - Cairo Bold 900)
       const topLineY = badgeY + (isLandscape ? 11 : 13);
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
-      ctx.font = `900 ${isLandscape ? 24 : 27}px '${config.fontFamily}', sans-serif`;
+      ctx.font = `900 ${isLandscape ? 24 : 27}px 'Cairo', 'Tajawal', sans-serif`;
       ctx.fillStyle = '#f59e0b';
       ctx.fillText(dalilakWord, textEndX, topLineY);
 
-      // Middle Line: Platform Description
+      // Middle Line: Platform Description (Fixed Official Brand Typography)
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
-      ctx.font = `bold ${isLandscape ? 13 : 13.5}px '${config.fontFamily}', sans-serif`;
+      ctx.font = `bold ${isLandscape ? 13 : 13.5}px 'Tajawal', 'Cairo', sans-serif`;
       ctx.fillStyle = '#f1f5f9';
       const line1Y = topLineY + 22;
-      ctx.fillText('المنصة الشاملة لإدارة وتوثيق الأنشطة والخدمات الميدانية', textEndX, line1Y);
+      ctx.fillText(dalilakSub, textEndX, line1Y);
 
       // Bottom Line: Enlarge Website URL (prominent, high-contrast, gold typography)
       const line2Y = line1Y + 22;
