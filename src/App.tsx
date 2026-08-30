@@ -24,6 +24,10 @@ import {
   Wand2
 } from 'lucide-react';
 
+import { DalilakActivitiesModal } from './components/DalilakActivitiesModal';
+import { mapBusinessToPosterConfig } from './services/dalilakService';
+import { DalilakBusiness } from './types';
+
 const INITIAL_CONFIG: PosterConfig = {
   businessName: 'لَمْعَة لِغَسِيل السَّيَّارَات',
   businessSubtitle: 'LAMAA CAR WASH & DETAILING',
@@ -87,6 +91,22 @@ export default function App() {
   const [isRendering, setIsRendering] = useState<boolean>(false);
   const [showTips, setShowTips] = useState<boolean>(false);
   const [mobileActiveView, setMobileActiveView] = useState<'controls' | 'preview'>('controls');
+  const [isDalilakModalOpen, setIsDalilakModalOpen] = useState<boolean>(false);
+
+  // Handle selecting a live Dalilak business
+  const handleSelectDalilakBusiness = (business: DalilakBusiness) => {
+    const updatedConfig = mapBusinessToPosterConfig(business, config);
+    setConfig(updatedConfig);
+    
+    // Switch to preview on mobile to see result instantly
+    setMobileActiveView('preview');
+
+    confetti({
+      particleCount: 70,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
 
   // Apply Business Preset
   const handleSelectPreset = (presetId: string) => {
@@ -178,6 +198,7 @@ export default function App() {
         onRandomMix={handleRandomMix}
         onDownloadHighRes={handleDownloadHighRes}
         onPrint={handlePrint}
+        onOpenDalilakModal={() => setIsDalilakModalOpen(true)}
         config={config}
         isRendering={isRendering}
       />
@@ -212,20 +233,29 @@ export default function App() {
 
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
               <button
+                onClick={() => setIsDalilakModalOpen(true)}
+                className="flex-1 sm:flex-initial text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-md shadow-emerald-500/20 active:scale-95 min-h-[38px] border border-emerald-400/30"
+                title="استعراض الأنشطة المسجلة لحظياً في دليلك"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping shrink-0" />
+                <span>📥 أنشطة دليلك</span>
+              </button>
+
+              <button
                 onClick={handleRandomMix}
-                className="flex-1 sm:flex-initial text-xs font-black text-amber-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-md shadow-amber-500/20 active:scale-95 min-h-[38px]"
+                className="text-xs font-black text-amber-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 px-3 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-md shadow-amber-500/20 active:scale-95 min-h-[38px]"
                 title="مزج عشوائي متناسق لكافة التصاميم والألوان والخطوط والأيقونات"
               >
                 <Dices className="w-4 h-4 text-amber-950" />
-                <span>مزج عشوائي ✨</span>
+                <span className="hidden sm:inline">مزج ✨</span>
               </button>
 
               <button
                 onClick={() => setShowTips(!showTips)}
-                className="text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-3 py-2 rounded-xl border border-amber-500/30 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm min-h-[38px]"
+                className="text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-2 rounded-xl border border-amber-500/30 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm min-h-[38px]"
               >
                 <Info className="w-4 h-4" />
-                <span>دليل الرابط</span>
+                <span className="hidden sm:inline">دليل</span>
               </button>
             </div>
           </div>
@@ -389,6 +419,13 @@ export default function App() {
           </span>
         </div>
       </footer>
+
+      {/* Dalilak Live Activities Modal */}
+      <DalilakActivitiesModal
+        isOpen={isDalilakModalOpen}
+        onClose={() => setIsDalilakModalOpen(false)}
+        onSelectBusiness={handleSelectDalilakBusiness}
+      />
 
     </div>
   );

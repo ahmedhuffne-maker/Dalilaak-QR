@@ -19,6 +19,7 @@ interface HeaderProps {
   onRandomMix?: () => void;
   onDownloadHighRes: () => void;
   onPrint: () => void;
+  onOpenDalilakModal?: () => void;
   config: PosterConfig;
   isRendering: boolean;
 }
@@ -29,6 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   onRandomMix,
   onDownloadHighRes,
   onPrint,
+  onOpenDalilakModal,
   config,
   isRendering
 }) => {
@@ -86,8 +88,21 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Quick Presets & Bento Actions - Mobile Scrollable */}
           <div className="flex items-center gap-1.5 sm:gap-2 w-full md:w-auto justify-between md:justify-end overflow-x-auto pb-1 md:pb-0 scrollbar-none">
             
+            {/* Dalilak Live Activities Explorer Button */}
+            {onOpenDalilakModal && (
+              <button
+                id="header-dalilak-activities-btn"
+                onClick={onOpenDalilakModal}
+                className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-700 hover:from-emerald-400 hover:to-emerald-600 text-white font-bold text-xs py-2 px-2.5 sm:px-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer transform active:scale-95 border border-emerald-400/40 min-h-[38px] shrink-0"
+                title="استيراد وتوليد ملصق من أنشطة دليلك المسجلة لحظياً"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping shrink-0" />
+                <span>📥 أنشطة دليلك</span>
+              </button>
+            )}
+
             {/* Quick Preset Selector */}
-            <div className="relative inline-flex items-center flex-1 sm:flex-initial min-w-[140px] max-w-[210px]">
+            <div className="relative inline-flex items-center flex-1 sm:flex-initial min-w-[130px] max-w-[190px]">
               <select
                 id="quick-preset-select"
                 aria-label="اختر نشاط تجاري جاهز"
@@ -114,12 +129,11 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="header-random-mix-btn"
                 onClick={onRandomMix}
-                className="inline-flex items-center justify-center gap-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-xs py-2 px-2.5 sm:px-3.5 rounded-xl shadow-md shadow-amber-500/25 transition-all cursor-pointer transform active:scale-95 border border-amber-300/40 min-h-[38px] shrink-0"
+                className="inline-flex items-center justify-center gap-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-xs py-2 px-2.5 sm:px-3 rounded-xl shadow-md shadow-amber-500/25 transition-all cursor-pointer transform active:scale-95 border border-amber-300/40 min-h-[38px] shrink-0"
                 title="توليد مزج عشوائي متناسق"
               >
                 <Dices className="w-3.5 h-3.5 text-slate-950 stroke-[2.5]" />
-                <span className="hidden sm:inline">مزج عشوائي ✨</span>
-                <span className="sm:hidden">مزج ✨</span>
+                <span className="hidden sm:inline">مزج ✨</span>
               </button>
             )}
 

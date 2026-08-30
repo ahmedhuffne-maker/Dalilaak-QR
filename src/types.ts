@@ -92,3 +92,34 @@ export interface ThemePreset {
   footerAccentColor: string;
   borderStyle: 'none' | 'thin-gold' | 'double-frame' | 'modern-dashed' | 'ornament-corners';
 }
+
+export interface DalilakBusiness {
+  id: string;
+  name_ar: string;
+  name_en?: string;
+  category?: string;
+  governorate?: string;
+  city?: string;
+  street?: string;
+  landmark?: string;
+  phone: string;
+  secondary_phone?: string;
+  working_hours?: string;
+  description?: string;
+  lat?: number;
+  lng?: number;
+  owner_name?: string;
+  owner_phone?: string;
+  owner_email?: string;
+  photos?: string[] | { url: string }[] | any;
+  rep_id?: string;
+  rep_name?: string;
+  package_name?: string;
+  payment_status?: string;
+  verification_status?: string;
+  google_maps_url?: string;
+  google_place_id?: string;
+  invoice_number?: string;
+  invoice_date?: string;
+  created_at?: string;
+}
