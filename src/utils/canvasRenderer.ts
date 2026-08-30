@@ -2379,7 +2379,7 @@ export async function renderPosterToCanvas(
     }
 
     // Optional Activity Number / Business Code Badge
-    if (config.showActivityNumber && config.activityNumber) {
+    if (config.activityNumber && config.activityNumber.trim() !== '') {
       const actLabel = config.activityNumberLabel || 'رقم النشاط';
       const actText = `${actLabel}: ${config.activityNumber}`;
       ctx.font = `bold 16px '${config.fontFamily}', Arial, sans-serif`;
@@ -2531,7 +2531,7 @@ export async function renderPosterToCanvas(
     }
 
     // Optional Activity Number / Business Code Badge
-    if (config.showActivityNumber && config.activityNumber) {
+    if (config.activityNumber && config.activityNumber.trim() !== '') {
       const actLabel = config.activityNumberLabel || 'رقم النشاط';
       const actText = `${actLabel}: ${config.activityNumber}`;
       ctx.font = `bold ${isSquare ? 15 : 17}px '${config.fontFamily}', Arial, sans-serif`;
