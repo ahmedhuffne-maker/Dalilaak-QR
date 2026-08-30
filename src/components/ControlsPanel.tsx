@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { 
   Building2, 
   Type, 
@@ -60,7 +60,9 @@ import {
   Laptop,
   MessageCircle,
   Instagram,
-  Compass
+  Compass,
+  Zap,
+  Bot
 } from 'lucide-react';
 import { PosterConfig, FontChoice, PosterFormat } from '../types';
 import { 
@@ -69,6 +71,11 @@ import {
   CTA_SUGGESTIONS, 
   AVAILABLE_ICONS 
 } from '../presets';
+import { 
+  generateSmartContextualTexts, 
+  BUSINESS_CATEGORIES, 
+  SmartGeneratedTexts 
+} from '../utils/textGeneratorEngine';
 
 const RenderBusinessIcon: React.FC<{ iconId: string; className?: string }> = ({ iconId, className = 'w-5 h-5' }) => {
   switch (iconId) {
@@ -138,8 +145,14 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   onRandomMix
 }) => {
   const [activeTab, setActiveTab] = useState<TabKey>('business');
+  const [showAiSuccessToast, setShowAiSuccessToast] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const qrInputRef = useRef<HTMLInputElement>(null);
+
+  // Compute smart texts dynamically based on current company name & service
+  const smartAnalysis: SmartGeneratedTexts = useMemo(() => {
+    return generateSmartContextualTexts(config.businessName, config.category);
+  }, [config.businessName, config.category]);
 
   const tabs: { key: TabKey; label: string; icon: React.ElementType }[] = [
     { key: 'business', label: 'النشاط', icon: Building2 },
@@ -149,6 +162,32 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
     { key: 'theme', label: 'الألوان', icon: Palette },
     { key: 'footer', label: 'التذييل', icon: ShieldCheck },
   ];
+
+  // Auto-apply entire smart suggested pack
+  const handleApplyFullSmartPack = () => {
+    const suggestedTheme = THEME_PRESETS.find(t => t.id === smartAnalysis.suggestedTheme) || THEME_PRESETS[0];
+    
+    onChange((prev) => ({
+      ...prev,
+      mainText: smartAnalysis.suggestedMainTexts[0] || prev.mainText,
+      secondaryText: smartAnalysis.suggestedSecondaryTexts[0] || prev.secondaryText,
+      businessSubtitle: prev.businessSubtitle || smartAnalysis.suggestedSubtitles[0] || '',
+      category: prev.category || smartAnalysis.detectedCategory.name,
+      selectedIcon: smartAnalysis.suggestedIcon,
+      themeId: suggestedTheme.id,
+      bgColor: suggestedTheme.bgColor,
+      bgTexture: suggestedTheme.bgTexture,
+      textColor: suggestedTheme.textColor,
+      accentColor: suggestedTheme.accentColor,
+      footerBgColor: suggestedTheme.footerBgColor,
+      footerTextColor: suggestedTheme.footerTextColor,
+      footerAccentColor: suggestedTheme.footerAccentColor,
+      borderStyle: suggestedTheme.borderStyle
+    }));
+
+    setShowAiSuccessToast(true);
+    setTimeout(() => setShowAiSuccessToast(false), 3000);
+  };
 
   // Handle Logo Upload
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,10 +222,10 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
   };
 
   return (
-    <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-800/90 shadow-2xl flex flex-col h-full overflow-hidden">
+    <div className="bg-slate-900/85 backdrop-blur-xl rounded-3xl border border-slate-800/90 shadow-2xl flex flex-col h-full overflow-hidden">
       
-      {/* Bento Navigation Tabs Header */}
-      <div className="flex border-b border-slate-800/80 bg-slate-950/40 p-2 overflow-x-auto scrollbar-none gap-1.5">
+      {/* Bento Navigation Tabs Header - Mobile Scrollable & Touch-Optimized */}
+      <div className="flex border-b border-slate-800/80 bg-slate-950/50 p-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 gap-1.5 touch-pan-x">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -195,42 +234,64 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               key={tab.key}
               id={`tab-${tab.key}`}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex-1 justify-center cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-xs font-bold whitespace-nowrap transition-all flex-1 justify-center cursor-pointer min-h-[44px] active:scale-95 ${
                 isActive
-                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 ring-1 ring-amber-400/50 font-extrabold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 ring-1 ring-amber-400/60 font-black'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/70 bg-slate-900/40'
               }`}
             >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? 'stroke-[2.5]' : ''}`} />
+              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'stroke-[2.5]' : ''}`} />
               <span>{tab.label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Magic Remix Button */}
-      {onRandomMix && (
-        <div className="px-5 pt-3 pb-0">
-          <button
-            type="button"
-            onClick={onRandomMix}
-            className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-500/15 via-amber-400/25 to-amber-500/15 hover:from-amber-500/30 hover:to-amber-500/30 border border-amber-500/40 hover:border-amber-400/70 rounded-2xl flex items-center justify-between text-amber-300 font-extrabold text-xs transition-all shadow-sm cursor-pointer group"
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                <Dices className="w-3.5 h-3.5 stroke-[2.5]" />
-              </div>
-              <span className="text-slate-100">مزج عشوائي لكافة الألوان والخطوط والأيقونات</span>
-            </div>
-            <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black group-hover:bg-amber-400">
-              توليد فوري ✨
-            </span>
-          </button>
+      {/* AI Success Feedback Toast */}
+      {showAiSuccessToast && (
+        <div className="mx-4 mt-3 p-2.5 bg-gradient-to-r from-emerald-500/20 via-emerald-500/10 to-transparent border border-emerald-500/40 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
+            <Check className="w-4 h-4 text-emerald-400" />
+            <span>تم توليد وتطبيق النصوص والألوان المتوافقة مع نشاطك بنجاح! ✨</span>
+          </div>
         </div>
       )}
 
+      {/* Magic Smart Text Generator Banner */}
+      <div className="px-4 sm:px-5 pt-3 pb-0">
+        <div className="p-3 bg-gradient-to-r from-amber-500/15 via-slate-850 to-slate-900 border border-amber-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+              <Bot className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-black text-slate-100">
+                  مولّد النصوص الذكي لـ {config.businessName ? `"${config.businessName}"` : 'نشاطك'}
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  {smartAnalysis.detectedCategory.name}
+                </span>
+              </div>
+              <span className="text-[11px] text-slate-400 block mt-0.5">
+                يتوقع طبيعة الخدمة واسم الشركة ويصيغ عبارات تقييم تسويقية دقيقة
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleApplyFullSmartPack}
+            className="self-end sm:self-auto px-3.5 py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-md shadow-amber-500/20 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 shrink-0"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>تطبيق الحزمة الذكية ✨</span>
+          </button>
+        </div>
+      </div>
+
       {/* Quick QR Upload Banner (Always Visible for Instant Access) */}
-      <div className="px-5 pt-3 pb-0">
+      <div className="px-4 sm:px-5 pt-3 pb-0">
         <input
           type="file"
           id="quick-qr-upload-input"
@@ -250,7 +311,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               </div>
               <div className="text-right">
                 <span className="block text-xs font-extrabold text-emerald-300">
-                  تم دمج كود الـ QR الجديد في التصميم ✓
+                  تم دمج كود الـ QR المخصص في التصميم ✓
                 </span>
                 <span className="block text-[11px] text-slate-400">
                   معروض الآن في الملصق بدقة عالية
@@ -261,43 +322,23 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               <button
                 type="button"
                 onClick={() => document.getElementById('quick-qr-upload-input')?.click()}
-                className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg border border-slate-650 transition-colors cursor-pointer"
+                className="px-3 py-2 bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-bold rounded-xl border border-slate-650 transition-colors cursor-pointer min-h-[36px]"
               >
                 تغيير
               </button>
               <button
                 type="button"
                 onClick={() => onChange((p) => ({ ...p, uploadedQrDataUrl: null, qrType: 'generated' }))}
-                className="p-1.5 text-rose-400 hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer"
+                className="p-2 text-rose-400 hover:bg-rose-500/20 rounded-xl transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
                 title="استعادة الـ QR التلقائي"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
         ) : (
           <div
             onClick={() => document.getElementById('quick-qr-upload-input')?.click()}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const file = e.dataTransfer.files?.[0];
-              if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                  onChange((prev) => ({
-                    ...prev,
-                    qrType: 'uploaded',
-                    uploadedQrDataUrl: event.target?.result as string
-                  }));
-                };
-                reader.readAsDataURL(file);
-              }
-            }}
             className="p-3 bg-gradient-to-r from-amber-500/10 via-slate-850 to-slate-900 border border-amber-500/30 hover:border-amber-400 rounded-2xl flex items-center justify-between cursor-pointer transition-all hover:shadow-lg group"
           >
             <div className="flex items-center gap-3">
@@ -313,7 +354,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 </span>
               </div>
             </div>
-            <div className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-sm transition-all group-hover:translate-x-[-2px]">
+            <div className="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-sm transition-all group-hover:translate-x-[-2px] shrink-0">
               رفع الكود
             </div>
           </div>
@@ -321,58 +362,56 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
       </div>
 
       {/* Main Tab Content */}
-      <div className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 text-right">
+      <div className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-5 text-right">
         
         {/* ================= TAB 1: BUSINESS & PRESETS ================= */}
         {activeTab === 'business' && (
           <div className="space-y-5">
-            {/* Quick Templates Selector */}
-            <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                  <Wand2 className="w-3.5 h-3.5 text-amber-400" />
-                  نماذج سريعة للأنشطة التجارية
-                </label>
-                <span className="text-[10px] text-slate-500">اختر نموذجاً لتعبئة البيانات تلقائياً</span>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {BUSINESS_PRESETS.map((preset) => (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    onClick={() => onApplyPreset(preset.id)}
-                    className="flex flex-col text-right p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-750 hover:border-amber-500/50 transition-all group cursor-pointer text-xs"
-                  >
-                    <span className="font-bold text-slate-200 group-hover:text-amber-400 transition-colors">
-                      {preset.name}
-                    </span>
-                    <span className="text-[11px] text-slate-400 truncate mt-0.5">
-                      {preset.businessName}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
+            
             {/* Arabic Business Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                اسم النشاط التجاري (الرئيسي باللغة العربية) *
+              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>اسم النشاط التجاري (الرئيسي باللغة العربية) *</span>
+                <span className="text-[10px] text-amber-400 font-semibold">يتم تخصيص النصوص عليه تلقائياً</span>
               </label>
               <input
                 id="input-business-name"
                 type="text"
                 value={config.businessName}
                 onChange={(e) => onChange((p) => ({ ...p, businessName: e.target.value }))}
-                placeholder="مثال: لمعة لغسيل السيارات"
-                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all font-bold"
+                placeholder="مثال: لمعة لغسيل وتلميع السيارات أو كافيه رونق"
+                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all font-bold min-h-[44px]"
+              />
+            </div>
+
+            {/* Category & Service Nature */}
+            <div>
+              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>طبيعة الخدمة أو تصنيف النشاط</span>
+                <span className="text-[10px] text-slate-400">مثل: كافيه مختص، عيادة أسنان، مغسلة سيارات</span>
+              </label>
+              <input
+                type="text"
+                value={config.category}
+                onChange={(e) => onChange((p) => ({ ...p, category: e.target.value }))}
+                placeholder="مثال: غسيل وتلميع سيارات، مقهى وقهوة مختصة، مطعم إيطالي، عيادة جلدية"
+                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 min-h-[44px]"
               />
             </div>
 
             {/* English Business Subtitle */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                الاسم الفرعي أو باللغة الإنجليزية (Subtitle)
+              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>الاسم الفرعي أو باللغة الإنجليزية (Subtitle)</span>
+                {smartAnalysis.suggestedSubtitles[0] && (
+                  <button
+                    type="button"
+                    onClick={() => onChange((p) => ({ ...p, businessSubtitle: smartAnalysis.suggestedSubtitles[0] }))}
+                    className="text-[10px] text-amber-400 hover:text-amber-300 font-bold underline cursor-pointer"
+                  >
+                    اقتراح ذكي: {smartAnalysis.suggestedSubtitles[0]}
+                  </button>
+                )}
               </label>
               <input
                 id="input-business-subtitle"
@@ -381,25 +420,11 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 value={config.businessSubtitle}
                 onChange={(e) => onChange((p) => ({ ...p, businessSubtitle: e.target.value }))}
                 placeholder="e.g. LAMAA CAR WASH & DETAILING"
-                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-left font-['Outfit',sans-serif] tracking-wider uppercase font-semibold"
+                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-left font-['Outfit',sans-serif] tracking-wider uppercase font-semibold min-h-[44px]"
               />
             </div>
 
-            {/* Category selection */}
-            <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                تصنيف النشاط
-              </label>
-              <input
-                type="text"
-                value={config.category}
-                onChange={(e) => onChange((p) => ({ ...p, category: e.target.value }))}
-                placeholder="مثال: غسيل وتلميع سيارات، مقهى، مطعم"
-                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-              />
-            </div>
-
-            {/* Activity Number / Business Code (Always Visible & Optional) */}
+            {/* Activity Number / Business Code */}
             <div className="p-3.5 bg-gradient-to-b from-slate-800/80 to-slate-850/80 border border-slate-700/80 rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
@@ -414,7 +439,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 value={config.activityNumber || ''}
                 onChange={(e) => onChange((p) => ({ ...p, activityNumber: e.target.value, showActivityNumber: !!e.target.value }))}
                 placeholder="مثال: 0114598874 أو #1042"
-                className="w-full bg-slate-900 border border-slate-750 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 font-mono text-left font-bold tracking-widest"
+                className="w-full bg-slate-900 border border-slate-750 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 font-mono text-left font-bold tracking-widest min-h-[44px]"
               />
 
               {/* Optional Icons Beside Number */}
@@ -426,7 +451,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange((p) => ({ ...p, activityShowWhatsAppIcon: p.activityShowWhatsAppIcon !== false ? false : true }))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer min-h-[40px] ${
                       config.activityShowWhatsAppIcon !== false
                         ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm font-extrabold'
                         : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700'
@@ -439,7 +464,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                   <button
                     type="button"
                     onClick={() => onChange((p) => ({ ...p, activityShowPhoneIcon: p.activityShowPhoneIcon !== false ? false : true }))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer min-h-[40px] ${
                       config.activityShowPhoneIcon !== false
                         ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-extrabold'
                         : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700'
@@ -452,13 +477,41 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               </div>
             </div>
 
+            {/* Quick Templates Selector */}
+            <div>
+              <div className="flex items-center justify-between mb-2.5">
+                <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <Wand2 className="w-3.5 h-3.5 text-amber-400" />
+                  أو اختر نموذجاً جاهزاً للأنشطة الشائعة
+                </label>
+                <span className="text-[10px] text-slate-500">تعبئة فورية</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {BUSINESS_PRESETS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => onApplyPreset(preset.id)}
+                    className="flex flex-col text-right p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-750 hover:border-amber-500/50 transition-all group cursor-pointer text-xs min-h-[50px] justify-center"
+                  >
+                    <span className="font-bold text-slate-200 group-hover:text-amber-400 transition-colors">
+                      {preset.name}
+                    </span>
+                    <span className="text-[11px] text-slate-400 truncate mt-0.5">
+                      {preset.businessName}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Google Badge Top Toggle */}
             <div className="p-3.5 bg-slate-800/50 border border-slate-750 rounded-xl flex items-center justify-between">
               <div>
                 <span className="block text-xs font-bold text-slate-200">شارة تقييمات خرائط Google المعتمدة</span>
                 <span className="block text-[11px] text-slate-400 mt-0.5">عرض شارة جوجل التوثيقية أعلى الملصق</span>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label className="relative inline-flex items-center cursor-pointer min-h-[44px] px-1">
                 <input
                   type="checkbox"
                   checked={config.showGoogleBadge}
@@ -468,27 +521,46 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 <div className="w-10 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
               </label>
             </div>
+
           </div>
         )}
 
         {/* ================= TAB 2: TEXTS & CTA ================= */}
         {activeTab === 'texts' && (
           <div className="space-y-5">
-            {/* Quick CTA Suggestions */}
-            <div>
-              <label className="text-xs font-bold text-slate-300 mb-2 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                اقتراحات عبارات دعوة التقييم
-              </label>
-              <div className="flex flex-wrap gap-1.5">
-                {CTA_SUGGESTIONS.map((cta, idx) => (
+            
+            {/* Smart Contextual Suggestions Customized for the Business */}
+            <div className="p-3.5 bg-gradient-to-b from-amber-500/10 to-slate-850 border border-amber-500/30 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  عبارات مخصصة تم توليدها لـ "{config.businessName || 'نشاطك'}"
+                </label>
+                <span className="text-[10px] text-slate-400 font-semibold">
+                  اضغط للتطبيق الفوري ⚡
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                {smartAnalysis.suggestedMainTexts.map((text, idx) => (
                   <button
                     key={idx}
                     type="button"
-                    onClick={() => onChange((p) => ({ ...p, mainText: cta }))}
-                    className="text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 py-1.5 px-2.5 rounded-lg border border-slate-700 transition-colors cursor-pointer text-right"
+                    onClick={() => onChange((p) => ({ 
+                      ...p, 
+                      mainText: text,
+                      secondaryText: smartAnalysis.suggestedSecondaryTexts[idx] || p.secondaryText 
+                    }))}
+                    className="w-full text-right p-2.5 rounded-xl bg-slate-900/80 hover:bg-amber-500/20 border border-slate-750 hover:border-amber-500/50 text-slate-200 hover:text-amber-300 transition-all cursor-pointer group flex items-start gap-2 text-xs"
                   >
-                    {cta.split('\n')[0]}
+                    <span className="w-5 h-5 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
+                      {idx + 1}
+                    </span>
+                    <div className="flex-1 overflow-hidden">
+                      <span className="font-bold block whitespace-pre-line leading-relaxed">
+                        {text}
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -496,8 +568,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
 
             {/* Main CTA Text */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                النص الرئيسي لدعوة التقييم (سطرين كحد أقصى للحجم المثالي)
+              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>النص الرئيسي لدعوة التقييم (سطرين كحد أقصى للحجم المثالي)</span>
+                <span className="text-[10px] text-slate-500">قابل للتعديل بحرية</span>
               </label>
               <textarea
                 id="input-main-text"
@@ -505,14 +578,23 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 value={config.mainText}
                 onChange={(e) => onChange((p) => ({ ...p, mainText: e.target.value }))}
                 placeholder="شاركنا رأيك وتقييمك&#10;امسح QR Code"
-                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all font-bold resize-none leading-relaxed"
+                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all font-bold resize-none leading-relaxed"
               />
             </div>
 
             {/* Secondary Subtitle */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                العبارة التوضيحية الإضافية (اختياري)
+              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>العبارة التوضيحية الإضافية (اختياري)</span>
+                {smartAnalysis.suggestedSecondaryTexts[0] && (
+                  <button
+                    type="button"
+                    onClick={() => onChange((p) => ({ ...p, secondaryText: smartAnalysis.suggestedSecondaryTexts[0] }))}
+                    className="text-[10px] text-amber-400 hover:underline font-bold"
+                  >
+                    استخدام المقترح
+                  </button>
+                )}
               </label>
               <input
                 id="input-secondary-text"
@@ -520,7 +602,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 value={config.secondaryText}
                 onChange={(e) => onChange((p) => ({ ...p, secondaryText: e.target.value }))}
                 placeholder="مثال: رأيك يصنع الفرق ويطور خدماتنا دائماً"
-                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 min-h-[44px]"
               />
             </div>
 
@@ -539,10 +621,10 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     key={count}
                     type="button"
                     onClick={() => onChange((p) => ({ ...p, starCount: count }))}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer min-h-[44px] ${
                       config.starCount === count
-                        ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm'
-                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                        ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md font-black'
+                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
                     }`}
                   >
                     {count} نجوم
@@ -558,7 +640,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                   <span className="block text-xs font-bold text-slate-200">شارة تقنية NFC / المسح الذكي</span>
                   <span className="block text-[11px] text-slate-400 mt-0.5">إضافة شريط "امسح أو مرر باللمس"</span>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer min-h-[44px] px-1">
                   <input
                     type="checkbox"
                     checked={config.showNfcBadge}
@@ -574,24 +656,26 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                   value={config.nfcText}
                   onChange={(e) => onChange((p) => ({ ...p, nfcText: e.target.value }))}
                   placeholder="امسح بالكاميرا أو مرر بطاقة NFC"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 min-h-[40px]"
                 />
               )}
             </div>
+
           </div>
         )}
 
         {/* ================= TAB 3: QR CODE & LINK ================= */}
         {activeTab === 'qr' && (
           <div className="space-y-5">
+            
             {/* Mode selection: Generated vs Uploaded */}
             <div className="flex rounded-xl bg-slate-800 p-1 border border-slate-700">
               <button
                 type="button"
                 onClick={() => onChange((p) => ({ ...p, qrType: 'generated' }))}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer min-h-[40px] ${
                   config.qrType === 'generated'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
+                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -600,9 +684,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               <button
                 type="button"
                 onClick={() => onChange((p) => ({ ...p, qrType: 'uploaded' }))}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer min-h-[40px] ${
                   config.qrType === 'uploaded'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
+                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -623,7 +707,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     value={config.qrUrl}
                     onChange={(e) => onChange((p) => ({ ...p, qrUrl: e.target.value }))}
                     placeholder="https://g.page/r/your-business/review"
-                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-left font-mono"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-left font-mono min-h-[44px]"
                   />
                   <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-400">
                     <span>💡 يمكنك وضع رابط تقييم Google Maps المباشر لنشاطك</span>
@@ -632,9 +716,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                         href={config.qrUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-amber-400 hover:underline flex items-center gap-1"
+                        className="text-amber-400 hover:underline flex items-center gap-1 font-bold"
                       >
-                        تجربة الرابط <ExternalLink className="w-2.5 h-2.5" />
+                        تجربة الرابط <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
                   </div>
@@ -649,7 +733,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                         key={c}
                         type="button"
                         onClick={() => onChange((p) => ({ ...p, qrColor: c }))}
-                        className={`w-6 h-6 rounded-full border-2 transition-all ${
+                        className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer ${
                           config.qrColor === c ? 'border-amber-400 scale-110' : 'border-transparent'
                         }`}
                         style={{ backgroundColor: c }}
@@ -659,7 +743,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                       type="color"
                       value={config.qrColor}
                       onChange={(e) => onChange((p) => ({ ...p, qrColor: e.target.value }))}
-                      className="w-7 h-7 rounded-lg border-0 cursor-pointer bg-transparent"
+                      className="w-8 h-8 rounded-lg border-0 cursor-pointer bg-transparent"
                     />
                   </div>
                 </div>
@@ -671,11 +755,11 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     <span className="text-[10px] text-amber-400 font-semibold">اختياري</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                     <button
                       type="button"
                       onClick={() => onChange((p) => ({ ...p, qrLogoCenter: true, qrCenterLogoType: 'dalilak' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center ${
                         config.qrLogoCenter && (config.qrCenterLogoType === 'dalilak' || !config.qrCenterLogoType)
                           ? 'bg-amber-500/15 border-amber-500 text-amber-300 font-bold ring-1 ring-amber-500/40 shadow-sm'
                           : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
@@ -690,7 +774,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => onChange((p) => ({ ...p, qrLogoCenter: true, qrCenterLogoType: 'google' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center ${
                         config.qrLogoCenter && config.qrCenterLogoType === 'google'
                           ? 'bg-blue-500/15 border-blue-500 text-blue-300 font-bold ring-1 ring-blue-500/40 shadow-sm'
                           : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
@@ -705,7 +789,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => onChange((p) => ({ ...p, qrLogoCenter: true, qrCenterLogoType: 'whatsapp' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center ${
                         config.qrLogoCenter && config.qrCenterLogoType === 'whatsapp'
                           ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300 font-bold ring-1 ring-emerald-500/40 shadow-sm'
                           : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
@@ -720,7 +804,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => onChange((p) => ({ ...p, qrLogoCenter: true, qrCenterLogoType: 'instagram' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center ${
                         config.qrLogoCenter && config.qrCenterLogoType === 'instagram'
                           ? 'bg-pink-500/15 border-pink-500 text-pink-300 font-bold ring-1 ring-pink-500/40 shadow-sm'
                           : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
@@ -735,7 +819,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => onChange((p) => ({ ...p, qrLogoCenter: true, qrCenterLogoType: 'snapchat' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center ${
                         config.qrLogoCenter && config.qrCenterLogoType === 'snapchat'
                           ? 'bg-yellow-500/15 border-yellow-500 text-yellow-300 font-bold ring-1 ring-yellow-500/40 shadow-sm'
                           : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
@@ -750,7 +834,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => onChange((p) => ({ ...p, qrLogoCenter: true, qrCenterLogoType: 'tiktok' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center ${
                         config.qrLogoCenter && config.qrCenterLogoType === 'tiktok'
                           ? 'bg-cyan-500/15 border-cyan-500 text-cyan-300 font-bold ring-1 ring-cyan-500/40 shadow-sm'
                           : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
@@ -765,7 +849,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => onChange((p) => ({ ...p, qrLogoCenter: true, qrCenterLogoType: 'tripadvisor' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center ${
                         config.qrLogoCenter && config.qrCenterLogoType === 'tripadvisor'
                           ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300 font-bold ring-1 ring-emerald-500/40 shadow-sm'
                           : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
@@ -779,23 +863,8 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
 
                     <button
                       type="button"
-                      onClick={() => onChange((p) => ({ ...p, qrLogoCenter: true, qrCenterLogoType: 'apple' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
-                        config.qrLogoCenter && config.qrCenterLogoType === 'apple'
-                          ? 'bg-slate-500/15 border-slate-400 text-slate-200 font-bold ring-1 ring-slate-400/40 shadow-sm'
-                          : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
-                      }`}
-                    >
-                      <div className="w-6 h-6 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-white font-bold text-xs">
-                        
-                      </div>
-                      <span className="text-[10px] font-bold leading-tight">Apple Maps</span>
-                    </button>
-
-                    <button
-                      type="button"
                       onClick={() => onChange((p) => ({ ...p, qrLogoCenter: true, qrCenterLogoType: 'star' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center ${
                         config.qrLogoCenter && config.qrCenterLogoType === 'star'
                           ? 'bg-amber-500/15 border-amber-500 text-amber-300 font-bold ring-1 ring-amber-500/40 shadow-sm'
                           : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
@@ -810,7 +879,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => onChange((p) => ({ ...p, qrLogoCenter: false, qrCenterLogoType: 'none' }))}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center ${
                         !config.qrLogoCenter || config.qrCenterLogoType === 'none'
                           ? 'bg-slate-700/60 border-slate-500 text-slate-100 font-bold shadow-sm'
                           : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-400'
@@ -856,14 +925,14 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                         <button
                           type="button"
                           onClick={() => qrInputRef.current?.click()}
-                          className="px-3 py-1.5 bg-slate-700 hover:bg-slate-650 text-slate-200 text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                          className="px-3 py-2 bg-slate-700 hover:bg-slate-650 text-slate-200 text-xs font-bold rounded-lg transition-colors cursor-pointer min-h-[36px]"
                         >
                           تغيير
                         </button>
                         <button
                           type="button"
                           onClick={() => onChange((p) => ({ ...p, uploadedQrDataUrl: null }))}
-                          className="p-2 text-rose-400 hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer"
+                          className="p-2 text-rose-400 hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
                           title="حذف الصورة"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -874,26 +943,6 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 ) : (
                   <div
                     onClick={() => qrInputRef.current?.click()}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      const file = e.dataTransfer.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          onChange((prev) => ({
-                            ...prev,
-                            qrType: 'uploaded',
-                            uploadedQrDataUrl: event.target?.result as string
-                          }));
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
                     className="border-2 border-dashed border-amber-500/40 hover:border-amber-400 rounded-2xl p-7 text-center cursor-pointer bg-slate-800/40 hover:bg-slate-800/80 transition-all group"
                   >
                     <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
@@ -925,7 +974,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 step="0.05"
                 value={config.qrScale || 1.25}
                 onChange={(e) => onChange((p) => ({ ...p, qrScale: parseFloat(e.target.value) }))}
-                className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
               />
               <div className="flex justify-between text-[10px] text-slate-400">
                 <span>متوسط (80%)</span>
@@ -933,6 +982,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 <span>أقصى حجم (140%)</span>
               </div>
             </div>
+
           </div>
         )}
 
@@ -944,9 +994,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               <button
                 type="button"
                 onClick={() => onChange((p) => ({ ...p, logoType: 'icon' }))}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer min-h-[40px] ${
                   config.logoType === 'icon'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
+                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -955,9 +1005,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               <button
                 type="button"
                 onClick={() => onChange((p) => ({ ...p, logoType: 'upload' }))}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex-1 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer min-h-[40px] ${
                   config.logoType === 'upload'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
+                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -966,9 +1016,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               <button
                 type="button"
                 onClick={() => onChange((p) => ({ ...p, logoType: 'none' }))}
-                className={`py-2 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`py-2.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer min-h-[40px] ${
                   config.logoType === 'none'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
+                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -979,18 +1029,19 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             {/* Icon Picker */}
             {config.logoType === 'icon' && (
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-2.5">
-                  اختر أيقونة مناسبة لنشاطك التجاري
+                <label className="block text-xs font-bold text-slate-300 mb-2.5 flex items-center justify-between">
+                  <span>اختر أيقونة مناسبة لنشاطك التجاري</span>
+                  <span className="text-[10px] text-amber-400">مقترح تلقائي: {smartAnalysis.suggestedIcon}</span>
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {AVAILABLE_ICONS.map((icon) => (
                     <button
                       key={icon.id}
                       type="button"
                       onClick={() => onChange((p) => ({ ...p, selectedIcon: icon.id }))}
-                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
+                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 min-h-[64px] justify-center active:scale-95 ${
                         config.selectedIcon === icon.id
-                          ? 'bg-amber-500/15 border-amber-400 text-amber-400 shadow-sm'
+                          ? 'bg-amber-500/20 border-amber-400 text-amber-400 shadow-md ring-1 ring-amber-400/50'
                           : 'bg-slate-800/60 border-slate-750 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
                       }`}
                     >
@@ -1029,7 +1080,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                       <button
                         type="button"
                         onClick={() => onChange((p) => ({ ...p, uploadedLogoDataUrl: null }))}
-                        className="p-2 text-rose-400 hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer"
+                        className="p-2.5 text-rose-400 hover:bg-rose-500/20 rounded-xl transition-colors cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
                         title="حذف الشعار"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1037,10 +1088,10 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     </div>
 
                     {/* Scale Slider */}
-                    <div>
-                      <div className="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
+                    <div className="p-3 bg-slate-800/40 rounded-xl border border-slate-750 space-y-1.5">
+                      <div className="flex justify-between text-xs font-bold text-slate-300 mb-1">
                         <span>حجم الشعار في الملصق</span>
-                        <span className="text-amber-400">{Math.round((config.logoScale || 1) * 100)}%</span>
+                        <span className="text-amber-400 font-mono">{Math.round((config.logoScale || 1) * 100)}%</span>
                       </div>
                       <input
                         type="range"
@@ -1049,7 +1100,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                         step="0.05"
                         value={config.logoScale || 1}
                         onChange={(e) => onChange((p) => ({ ...p, logoScale: parseFloat(e.target.value) }))}
-                        className="w-full accent-amber-500"
+                        className="w-full h-2 accent-amber-500 cursor-pointer"
                       />
                     </div>
                   </div>
@@ -1077,7 +1128,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 <Palette className="w-3.5 h-3.5 text-amber-400" />
                 سمات الألوان الفاخرة المعتمدة
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {THEME_PRESETS.map((t) => (
                   <button
                     key={t.id}
@@ -1096,9 +1147,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                         borderStyle: t.borderStyle
                       }))
                     }
-                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-right transition-all cursor-pointer ${
+                    className={`flex items-center gap-2.5 p-3 rounded-xl border text-right transition-all cursor-pointer min-h-[48px] ${
                       config.themeId === t.id
-                        ? 'bg-slate-800 border-amber-400 shadow-md ring-1 ring-amber-400/40'
+                        ? 'bg-slate-800 border-amber-400 shadow-md ring-1 ring-amber-400/40 font-bold'
                         : 'bg-slate-850 border-slate-750 hover:bg-slate-800'
                     }`}
                   >
@@ -1119,7 +1170,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               <label className="block text-xs font-bold text-slate-300 mb-2">
                 نوع الخط العربي المستخدم
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {(
                   [
                     { id: 'Cairo', label: 'خط كايرو (عريض ومودرن)' },
@@ -1133,9 +1184,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     key={font.id}
                     type="button"
                     onClick={() => onChange((p) => ({ ...p, fontFamily: font.id }))}
-                    className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
+                    className={`py-3 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center min-h-[44px] flex items-center justify-center ${
                       config.fontFamily === font.id
-                        ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md font-extrabold ring-1 ring-amber-400'
+                        ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md font-black ring-1 ring-amber-400'
                         : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750 hover:text-white'
                     }`}
                     style={{ fontFamily: font.id }}
@@ -1159,7 +1210,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                       type="color"
                       value={config.bgColor}
                       onChange={(e) => onChange((p) => ({ ...p, bgColor: e.target.value }))}
-                      className="w-10 h-8 rounded-lg border border-slate-700 cursor-pointer bg-transparent"
+                      className="w-10 h-9 rounded-lg border border-slate-700 cursor-pointer bg-transparent"
                     />
                   </div>
                 </div>
@@ -1172,7 +1223,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                       type="color"
                       value={config.textColor}
                       onChange={(e) => onChange((p) => ({ ...p, textColor: e.target.value }))}
-                      className="w-10 h-8 rounded-lg border border-slate-700 cursor-pointer bg-transparent"
+                      className="w-10 h-9 rounded-lg border border-slate-700 cursor-pointer bg-transparent"
                     />
                   </div>
                 </div>
@@ -1185,7 +1236,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                       type="color"
                       value={config.accentColor}
                       onChange={(e) => onChange((p) => ({ ...p, accentColor: e.target.value }))}
-                      className="w-10 h-8 rounded-lg border border-slate-700 cursor-pointer bg-transparent"
+                      className="w-10 h-9 rounded-lg border border-slate-700 cursor-pointer bg-transparent"
                     />
                   </div>
                 </div>
@@ -1207,9 +1258,9 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     key={b.id}
                     type="button"
                     onClick={() => onChange((p) => ({ ...p, borderStyle: b.id as any }))}
-                    className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                    className={`py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer min-h-[44px] ${
                       config.borderStyle === b.id
-                        ? 'bg-amber-500 text-slate-950 border-amber-400'
+                        ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-md'
                         : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
                     }`}
                   >
@@ -1218,6 +1269,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 ))}
               </div>
             </div>
+
           </div>
         )}
 
@@ -1230,7 +1282,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 <span className="block text-xs font-bold text-slate-200">إظهار شريط التذييل السفلي (Footer)</span>
                 <span className="block text-[11px] text-slate-400 mt-0.5">يحتوي على رقم التواصل وشعار التوثيق</span>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label className="relative inline-flex items-center cursor-pointer min-h-[44px] px-1">
                 <input
                   type="checkbox"
                   checked={config.showFooter}
@@ -1256,7 +1308,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     value={config.footerPhone}
                     onChange={(e) => onChange((p) => ({ ...p, footerPhone: e.target.value }))}
                     placeholder="01556221141"
-                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-left font-['Outfit',sans-serif] font-bold"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-left font-['Outfit',sans-serif] font-bold min-h-[44px]"
                   />
 
                   {/* Optional Icons beside Footer Phone */}
@@ -1268,10 +1320,10 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                       <button
                         type="button"
                         onClick={() => onChange((p) => ({ ...p, footerShowWhatsAppIcon: p.footerShowWhatsAppIcon !== false ? false : true }))}
-                        className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                        className={`flex items-center justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer min-h-[44px] ${
                           config.footerShowWhatsAppIcon !== false
                             ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm font-extrabold'
-                            : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:border-slate-600'
+                            : 'bg-slate-800/60 text-slate-400 border-slate-750 hover:border-slate-650'
                         }`}
                       >
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
@@ -1281,10 +1333,10 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                       <button
                         type="button"
                         onClick={() => onChange((p) => ({ ...p, footerShowPhoneIcon: !p.footerShowPhoneIcon }))}
-                        className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                        className={`flex items-center justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer min-h-[44px] ${
                           config.footerShowPhoneIcon
                             ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-extrabold'
-                            : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:border-slate-600'
+                            : 'bg-slate-800/60 text-slate-400 border-slate-750 hover:border-slate-650'
                         }`}
                       >
                         <Phone className="w-3.5 h-3.5 text-amber-400" />
@@ -1301,7 +1353,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                       <ShieldCheck className="w-4 h-4 text-amber-400" />
                       <span className="text-xs font-bold text-slate-200">توثيق شركة دليلك المعتمدة</span>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-center cursor-pointer min-h-[44px] px-1">
                       <input
                         type="checkbox"
                         checked={config.showDalilakBranding}
@@ -1322,7 +1374,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                           type="text"
                           value={config.dalilakText}
                           onChange={(e) => onChange((p) => ({ ...p, dalilakText: e.target.value }))}
-                          className="w-full bg-slate-850 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200"
+                          className="w-full bg-slate-850 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 min-h-[40px]"
                         />
                       </div>
                       <div>
@@ -1333,7 +1385,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                           type="text"
                           value={config.dalilakSubtext}
                           onChange={(e) => onChange((p) => ({ ...p, dalilakSubtext: e.target.value }))}
-                          className="w-full bg-slate-850 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200"
+                          className="w-full bg-slate-850 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 min-h-[40px]"
                         />
                       </div>
                       <div>
@@ -1346,7 +1398,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                           value={config.footerWebsite || 'www.dalilaak.com'}
                           onChange={(e) => onChange((p) => ({ ...p, footerWebsite: e.target.value }))}
                           placeholder="www.dalilaak.com"
-                          className="w-full bg-slate-850 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-amber-300 font-mono"
+                          className="w-full bg-slate-850 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-300 font-mono min-h-[40px]"
                         />
                       </div>
                     </div>
@@ -1362,7 +1414,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                         key={c}
                         type="button"
                         onClick={() => onChange((p) => ({ ...p, footerBgColor: c }))}
-                        className={`w-6 h-6 rounded-full border-2 transition-all ${
+                        className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer ${
                           config.footerBgColor === c ? 'border-amber-400 scale-110' : 'border-transparent'
                         }`}
                         style={{ backgroundColor: c }}
@@ -1372,10 +1424,11 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                       type="color"
                       value={config.footerBgColor}
                       onChange={(e) => onChange((p) => ({ ...p, footerBgColor: e.target.value }))}
-                      className="w-7 h-7 rounded-lg border-0 cursor-pointer bg-transparent"
+                      className="w-8 h-8 rounded-lg border-0 cursor-pointer bg-transparent"
                     />
                   </div>
                 </div>
+
               </div>
             )}
           </div>

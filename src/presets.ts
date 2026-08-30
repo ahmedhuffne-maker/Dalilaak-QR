@@ -1,4 +1,5 @@
 import { BusinessPreset, ThemePreset, PosterConfig, PosterFormat, FontChoice } from './types';
+import { generateSmartContextualTexts } from './utils/textGeneratorEngine';
 
 export const BUSINESS_PRESETS: BusinessPreset[] = [
   {
@@ -396,6 +397,9 @@ export const AVAILABLE_ICONS = [
 ];
 
 export function generateRandomMix(currentConfig: PosterConfig): PosterConfig {
+  // Smart Contextual Text Generation based on business name & category
+  const smart = generateSmartContextualTexts(currentConfig.businessName, currentConfig.category);
+
   // 1. Random Theme
   const randomTheme = THEME_PRESETS[Math.floor(Math.random() * THEME_PRESETS.length)];
 
@@ -407,11 +411,12 @@ export function generateRandomMix(currentConfig: PosterConfig): PosterConfig {
   const formats: PosterFormat[] = ['a4', 'a4_landscape', 'a4_quad', 'a5', 'square', 'badge', 'a3', 'a3_quad', 'a3_landscape'];
   const randomFormat = formats[Math.floor(Math.random() * formats.length)];
 
-  // 4. Random CTA text from suggestions
-  const randomCta = CTA_SUGGESTIONS[Math.floor(Math.random() * CTA_SUGGESTIONS.length)];
+  // 4. Smart Tailored CTA text from smart generator
+  const randomCta = smart.suggestedMainTexts[Math.floor(Math.random() * smart.suggestedMainTexts.length)];
+  const randomSecondary = smart.suggestedSecondaryTexts[Math.floor(Math.random() * smart.suggestedSecondaryTexts.length)];
 
-  // 5. Random Icon from AVAILABLE_ICONS
-  const randomIcon = AVAILABLE_ICONS[Math.floor(Math.random() * AVAILABLE_ICONS.length)].id;
+  // 5. Smart matching Icon or random from available
+  const randomIcon = Math.random() > 0.35 ? smart.suggestedIcon : AVAILABLE_ICONS[Math.floor(Math.random() * AVAILABLE_ICONS.length)].id;
 
   // 6. Random Stars
   const randomStars = Math.random() > 0.15 ? 5 : 4;
@@ -436,9 +441,10 @@ export function generateRandomMix(currentConfig: PosterConfig): PosterConfig {
   return {
     ...currentConfig,
 
-    // PRESERVED STRICTLY: Business name, subtitle, activity number, phone, QR & center logo
+    // PRESERVED STRICTLY: Business name, subtitle (unless empty), activity number, phone, QR & center logo
     businessName: currentConfig.businessName,
-    businessSubtitle: currentConfig.businessSubtitle,
+    businessSubtitle: currentConfig.businessSubtitle || smart.suggestedSubtitles[0] || '',
+    category: currentConfig.category || smart.detectedCategory.name,
     activityNumber: currentConfig.activityNumber,
     activityNumberLabel: currentConfig.activityNumberLabel,
     footerPhone: currentConfig.footerPhone,
@@ -455,8 +461,9 @@ export function generateRandomMix(currentConfig: PosterConfig): PosterConfig {
     dalilakSubtext: currentConfig.dalilakSubtext,
     footerWebsite: currentConfig.footerWebsite,
 
-    // SHUFFLED / REMIXED ATTRIBUTES:
+    // SHUFFLED / REMIXED ATTRIBUTES WITH SMART CONTEXT:
     mainText: randomCta,
+    secondaryText: randomSecondary,
     starCount: randomStars,
     themeId: randomTheme.id,
     bgColor: randomTheme.bgColor,
