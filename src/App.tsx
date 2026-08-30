@@ -23,6 +23,8 @@ const INITIAL_CONFIG: PosterConfig = {
   showActivityNumber: false,
   activityNumber: '',
   activityNumberLabel: 'رقم النشاط',
+  activityShowWhatsAppIcon: true,
+  activityShowPhoneIcon: true,
   
   mainText: 'شاركنا رأيك\nوتقييمك',
   secondaryText: '',
@@ -55,6 +57,8 @@ const INITIAL_CONFIG: PosterConfig = {
   showFooter: true,
   footerPhone: '01556221141',
   footerWhatsApp: '01556221141',
+  footerShowWhatsAppIcon: true,
+  footerShowPhoneIcon: false,
   footerBgColor: '#070d18',
   footerTextColor: '#ffffff',
   footerAccentColor: '#e5a82e',

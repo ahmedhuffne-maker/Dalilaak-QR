@@ -10,6 +10,8 @@ export interface PosterConfig {
   showActivityNumber?: boolean;
   activityNumber?: string;
   activityNumberLabel?: string;
+  activityShowWhatsAppIcon?: boolean;
+  activityShowPhoneIcon?: boolean;
   
   // Call to action
   mainText: string;
@@ -47,6 +49,8 @@ export interface PosterConfig {
   showFooter: boolean;
   footerPhone: string;
   footerWhatsApp: string;
+  footerShowWhatsAppIcon?: boolean;
+  footerShowPhoneIcon?: boolean;
   footerBgColor: string;
   footerTextColor: string;
   footerAccentColor: string;

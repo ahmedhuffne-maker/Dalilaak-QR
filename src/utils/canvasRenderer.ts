@@ -371,6 +371,53 @@ async function drawWhatsAppIcon(
   }
 }
 
+function drawPhoneHandsetIcon(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+  bgColor = '#e5a82e',
+  iconColor = '#070d18'
+) {
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  // Background Circle
+  ctx.fillStyle = bgColor;
+  ctx.beginPath();
+  ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Handset silhouette
+  const s = size * 0.44;
+  ctx.save();
+  ctx.rotate(-Math.PI * 0.18);
+  ctx.translate(-s * 0.05, -s * 0.08);
+
+  ctx.fillStyle = iconColor;
+  ctx.strokeStyle = iconColor;
+
+  // Left ear capsule
+  ctx.beginPath();
+  ctx.arc(-s * 0.45, -s * 0.45, s * 0.22, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Right mouth capsule
+  ctx.beginPath();
+  ctx.arc(s * 0.45, s * 0.45, s * 0.22, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Connecting bridge
+  ctx.lineWidth = s * 0.38;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(0, 0, s * 0.48, Math.PI * 0.72, Math.PI * 1.78, true);
+  ctx.stroke();
+
+  ctx.restore();
+  ctx.restore();
+}
+
 async function drawCenterLogoInQr(
   ctx: CanvasRenderingContext2D,
   config: PosterConfig,
@@ -2378,16 +2425,25 @@ export async function renderPosterToCanvas(
       rightY += titleFontSize + 8;
     }
 
-    // Optional Large, Prominent Official Business/Activity Code Badge (No text label, pure bold styling)
+    // Optional Large, Prominent Official Business/Activity Code Badge (with optional WhatsApp & Phone icons)
     if (config.activityNumber && config.activityNumber.trim() !== '') {
       const cleanNum = config.activityNumber.trim();
       const numFontSize = 24;
       ctx.font = `900 ${numFontSize}px 'Outfit', 'Cairo', 'Tajawal', sans-serif`;
-      ctx.letterSpacing = '3px';
+      ctx.letterSpacing = '2.5px';
       const actMeasured = ctx.measureText(cleanNum);
-      const pillW = Math.max(220, actMeasured.width + 52);
-      const pillH = 42;
+
+      const showWa = config.activityShowWhatsAppIcon !== false;
+      const showPh = config.activityShowPhoneIcon !== false;
+      const iconCount = (showWa ? 1 : 0) + (showPh ? 1 : 0);
+      const iconSize = 28;
+      const iconSpacing = 6;
+      const iconsTotalW = iconCount > 0 ? (iconCount * iconSize) + ((iconCount - 1) * iconSpacing) + 12 : 0;
+
+      const pillW = Math.max(220, actMeasured.width + iconsTotalW + 48);
+      const pillH = 44;
       const pillX = rightColCenterX - pillW / 2;
+      const pillCenterY = rightY + pillH / 2;
 
       // Soft shadow for depth
       ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
@@ -2404,11 +2460,27 @@ export async function renderPosterToCanvas(
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
 
-      // Large crisp digits in center
+      // Center both icons + digits
+      const totalContentW = actMeasured.width + iconsTotalW;
+      let curX = rightColCenterX - totalContentW / 2;
+
+      if (showWa) {
+        await drawWhatsAppIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize);
+        curX += iconSize + iconSpacing;
+      }
+      if (showPh) {
+        drawPhoneHandsetIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize, config.accentColor || '#e5a82e', '#070d18');
+        curX += iconSize + iconSpacing;
+      }
+      if (iconCount > 0) {
+        curX += 6;
+      }
+
+      // Large crisp digits
       ctx.fillStyle = config.textColor || '#0f172a';
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText(cleanNum, rightColCenterX, rightY + pillH / 2 + 1);
+      ctx.fillText(cleanNum, curX, pillCenterY + 1);
       ctx.letterSpacing = '0px';
 
       rightY += pillH + 16;
@@ -2543,16 +2615,25 @@ export async function renderPosterToCanvas(
       currentY += titleFontSize + 8;
     }
 
-    // Optional Large, Prominent Official Business/Activity Code Badge (No text label, pure bold styling)
+    // Optional Large, Prominent Official Business/Activity Code Badge (with optional WhatsApp & Phone icons)
     if (config.activityNumber && config.activityNumber.trim() !== '') {
       const cleanNum = config.activityNumber.trim();
       const numFontSize = isSquare ? 23 : 26;
       ctx.font = `900 ${numFontSize}px 'Outfit', 'Cairo', 'Tajawal', sans-serif`;
-      ctx.letterSpacing = '3px';
+      ctx.letterSpacing = '2.5px';
       const actMeasured = ctx.measureText(cleanNum);
-      const pillW = Math.max(isSquare ? 200 : 250, actMeasured.width + 56);
-      const pillH = isSquare ? 40 : 46;
+
+      const showWa = config.activityShowWhatsAppIcon !== false;
+      const showPh = config.activityShowPhoneIcon !== false;
+      const iconCount = (showWa ? 1 : 0) + (showPh ? 1 : 0);
+      const iconSize = isSquare ? 28 : 32;
+      const iconSpacing = 8;
+      const iconsTotalW = iconCount > 0 ? (iconCount * iconSize) + ((iconCount - 1) * iconSpacing) + 14 : 0;
+
+      const pillW = Math.max(isSquare ? 200 : 250, actMeasured.width + iconsTotalW + 52);
+      const pillH = isSquare ? 42 : 48;
       const pillX = (baseWidth - pillW) / 2;
+      const pillCenterY = currentY + pillH / 2;
 
       // Soft shadow for depth
       ctx.shadowColor = 'rgba(0, 0, 0, 0.09)';
@@ -2569,11 +2650,27 @@ export async function renderPosterToCanvas(
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
 
-      // Large crisp digits in center
+      // Center both icons + digits
+      const totalContentW = actMeasured.width + iconsTotalW;
+      let curX = (baseWidth - totalContentW) / 2;
+
+      if (showWa) {
+        await drawWhatsAppIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize);
+        curX += iconSize + iconSpacing;
+      }
+      if (showPh) {
+        drawPhoneHandsetIcon(ctx, curX + iconSize / 2, pillCenterY, iconSize, config.accentColor || '#e5a82e', '#070d18');
+        curX += iconSize + iconSpacing;
+      }
+      if (iconCount > 0) {
+        curX += 6;
+      }
+
+      // Large crisp digits
       ctx.fillStyle = config.textColor || '#0f172a';
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText(cleanNum, baseWidth / 2, currentY + pillH / 2 + 1);
+      ctx.fillText(cleanNum, curX, pillCenterY + 1);
       ctx.letterSpacing = '0px';
 
       currentY += pillH + 18;
@@ -2688,8 +2785,15 @@ export async function renderPosterToCanvas(
     // Fixed Phone Number: Always ensure 01556221141 is used
     const phoneToDisplay = config.footerPhone || '01556221141';
 
-    // Left Side: Phone / Contact Pill with Gold Outline and Official WhatsApp Logo
-    const phonePillW = isLandscape ? 240 : 260;
+    // Left Side: Phone / Contact Pill with Gold Outline
+    const showFooterWa = config.footerShowWhatsAppIcon !== false;
+    const showFooterPh = !!config.footerShowPhoneIcon;
+    const footerIconCount = (showFooterWa ? 1 : 0) + (showFooterPh ? 1 : 0);
+
+    const iconSize = 34;
+    const iconGap = 6;
+    const totalIconsW = footerIconCount > 0 ? (footerIconCount * iconSize) + ((footerIconCount - 1) * iconGap) + 12 : 0;
+    const phonePillW = isLandscape ? Math.max(240, 220 + totalIconsW) : Math.max(260, 230 + totalIconsW);
     const phonePillH = 48;
     const phonePillX = 30;
     const phonePillY = footerContentCenterY - phonePillH / 2;
@@ -2699,20 +2803,23 @@ export async function renderPosterToCanvas(
     ctx.lineWidth = 2.2;
     drawRoundRect(ctx, phonePillX, phonePillY, phonePillW, phonePillH, phonePillH / 2, false, true);
 
-    // Official WhatsApp Circular Badge inside Pill on the right
-    const circleRadius = 18;
-    const circleCenterX = phonePillX + phonePillW - circleRadius - 6;
-    const circleCenterY = phonePillY + phonePillH / 2;
+    let curSlotX = phonePillX + phonePillW - 24;
 
-    // Draw the actual authentic official WhatsApp vector logo
-    await drawWhatsAppIcon(ctx, circleCenterX, circleCenterY, circleRadius * 2);
+    if (showFooterWa) {
+      await drawWhatsAppIcon(ctx, curSlotX, footerContentCenterY, iconSize);
+      curSlotX -= (iconSize + iconGap);
+    }
+    if (showFooterPh) {
+      drawPhoneHandsetIcon(ctx, curSlotX, footerContentCenterY, iconSize, config.footerAccentColor || '#e5a82e', '#070d18');
+      curSlotX -= (iconSize + iconGap);
+    }
 
-    // Phone text on the left of the pill in crisp white
+    const availableTextW = curSlotX - phonePillX - 6;
     ctx.fillStyle = '#ffffff';
-    ctx.font = "bold 24px 'Outfit', 'Tajawal', Arial, sans-serif";
+    ctx.font = "bold 23px 'Outfit', 'Tajawal', Arial, sans-serif";
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(phoneToDisplay, phonePillX + (phonePillW - circleRadius * 2 - 10) / 2 + 2, circleCenterY);
+    ctx.fillText(phoneToDisplay, phonePillX + (availableTextW > 0 ? availableTextW / 2 + 10 : phonePillW / 2), footerContentCenterY);
 
     // Right Side: Dalilak Official Branding & Golden Pin Lockup (Exact Reference match)
     if (config.showDalilakBranding) {

@@ -376,7 +376,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             </div>
 
             {/* Activity Number / Business Code (Always Visible & Optional) */}
-            <div className="p-3.5 bg-gradient-to-b from-slate-800/80 to-slate-850/80 border border-slate-700/80 rounded-2xl space-y-2">
+            <div className="p-3.5 bg-gradient-to-b from-slate-800/80 to-slate-850/80 border border-slate-700/80 rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
                   <Hash className="w-3.5 h-3.5 text-amber-400" />
@@ -392,6 +392,40 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                 placeholder="مثال: 0114598874 أو #1042"
                 className="w-full bg-slate-900 border border-slate-750 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 font-mono text-left font-bold tracking-widest"
               />
+
+              {/* Optional Icons Beside Number */}
+              <div className="pt-2 border-t border-slate-750/70 space-y-1.5">
+                <span className="block text-[11px] font-bold text-slate-300">
+                  إضافة أو إزالة الرموز بجانب الرقم:
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onChange((p) => ({ ...p, activityShowWhatsAppIcon: p.activityShowWhatsAppIcon !== false ? false : true }))}
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      config.activityShowWhatsAppIcon !== false
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm font-extrabold'
+                        : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <span>رمز واتساب</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => onChange((p) => ({ ...p, activityShowPhoneIcon: p.activityShowPhoneIcon !== false ? false : true }))}
+                    className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      config.activityShowPhoneIcon !== false
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-extrabold'
+                        : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <Phone className="w-3.5 h-3.5 text-amber-400" />
+                    <span>رمز الهاتف</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Google Badge Top Toggle */}
@@ -1186,8 +1220,8 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
             {config.showFooter && (
               <div className="space-y-4">
                 {/* Phone / Contact Number */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-slate-300 flex items-center gap-1.5">
                     <Phone className="w-3.5 h-3.5 text-amber-400" />
                     رقم التواصل / خدمة العملاء (للتذييل)
                   </label>
@@ -1200,6 +1234,40 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     placeholder="01556221141"
                     className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-left font-['Outfit',sans-serif] font-bold"
                   />
+
+                  {/* Optional Icons beside Footer Phone */}
+                  <div className="pt-1.5 space-y-1.5">
+                    <span className="block text-[11px] font-bold text-slate-300">
+                      رموز شريط التذييل:
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onChange((p) => ({ ...p, footerShowWhatsAppIcon: p.footerShowWhatsAppIcon !== false ? false : true }))}
+                        className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          config.footerShowWhatsAppIcon !== false
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm font-extrabold'
+                            : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:border-slate-600'
+                        }`}
+                      >
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                        <span>رمز واتساب</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onChange((p) => ({ ...p, footerShowPhoneIcon: !p.footerShowPhoneIcon }))}
+                        className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          config.footerShowPhoneIcon
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-extrabold'
+                            : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:border-slate-600'
+                        }`}
+                      >
+                        <Phone className="w-3.5 h-3.5 text-amber-400" />
+                        <span>رمز الهاتف</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Dalilak Verification Box */}
