@@ -2034,6 +2034,19 @@ function drawCategoryIcon(
   ctx.restore();
 }
 
+function isDarkColor(colorHex: string): boolean {
+  if (!colorHex) return false;
+  let hex = colorHex.replace('#', '');
+  if (hex.length === 3) {
+    hex = hex.split('').map((c) => c + c).join('');
+  }
+  const r = parseInt(hex.substring(0, 2), 16) || 0;
+  const g = parseInt(hex.substring(2, 4), 16) || 0;
+  const b = parseInt(hex.substring(4, 6), 16) || 0;
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness < 135;
+}
+
 // Load image asynchronously
 export function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
@@ -2422,8 +2435,13 @@ export async function renderPosterToCanvas(
       ctx.shadowBlur = 8;
       ctx.shadowOffsetY = 2;
 
+      // Theme-adaptive badge styling for 100% contrast in all themes
+      const isDarkTheme = isDarkColor(config.bgColor || '#ffffff');
+      const badgeBg = isDarkTheme ? 'rgba(15, 23, 42, 0.94)' : 'rgba(255, 255, 255, 0.95)';
+      const badgeText = isDarkTheme ? '#ffffff' : '#0f172a';
+
       // Luxury Pill Background
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+      ctx.fillStyle = badgeBg;
       ctx.strokeStyle = config.accentColor || '#e5a82e';
       ctx.lineWidth = 2.4;
       drawRoundRect(ctx, pillX, rightY, pillW, pillH, pillH / 2, true, true);
@@ -2435,8 +2453,8 @@ export async function renderPosterToCanvas(
       // Start X for entire centered group (Digits + Icons)
       let curX = rightColCenterX - totalContentW / 2;
 
-      // 1. Draw digits
-      ctx.fillStyle = config.textColor || '#0f172a';
+      // 1. Draw digits with guaranteed high contrast
+      ctx.fillStyle = badgeText;
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.fillText(cleanNum, curX, pillCenterY + 1);
@@ -2613,8 +2631,13 @@ export async function renderPosterToCanvas(
       ctx.shadowBlur = 10;
       ctx.shadowOffsetY = 3;
 
+      // Theme-adaptive badge styling for 100% contrast in all themes
+      const isDarkTheme = isDarkColor(config.bgColor || '#ffffff');
+      const badgeBg = isDarkTheme ? 'rgba(15, 23, 42, 0.94)' : 'rgba(255, 255, 255, 0.95)';
+      const badgeText = isDarkTheme ? '#ffffff' : '#0f172a';
+
       // Luxury Pill Background: semi-translucent crisp background with accent border
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+      ctx.fillStyle = badgeBg;
       ctx.strokeStyle = config.accentColor || '#e5a82e';
       ctx.lineWidth = 2.5;
       drawRoundRect(ctx, pillX, currentY, pillW, pillH, pillH / 2, true, true);
@@ -2626,8 +2649,8 @@ export async function renderPosterToCanvas(
       // Start X to center the group (Digits + Icons)
       let curX = (baseWidth - totalContentW) / 2;
 
-      // 1. Draw digits
-      ctx.fillStyle = config.textColor || '#0f172a';
+      // 1. Draw digits with guaranteed high contrast
+      ctx.fillStyle = badgeText;
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.fillText(cleanNum, curX, pillCenterY + 1);
