@@ -1,0 +1,6 @@
+{
+  "name": "صانع ملصقات التقييم",
+  "description": "أداة متقدمة لتصميم ملصقات وستاندات تقييمات جوجل للأنشطة التجارية برمز QR قابل للتخصيص وخيارات طباعة متنوعة",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
