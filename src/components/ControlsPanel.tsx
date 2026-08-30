@@ -589,28 +589,51 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
               />
             </div>
 
-            {/* Secondary Subtitle */}
-            <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span>العبارة التوضيحية الإضافية (اختياري)</span>
-                {smartAnalysis.suggestedSecondaryTexts[0] && (
-                  <button
-                    type="button"
-                    onClick={() => onChange((p) => ({ ...p, secondaryText: smartAnalysis.suggestedSecondaryTexts[0] }))}
-                    className="text-[10px] text-amber-400 hover:underline font-bold"
-                  >
-                    استخدام المقترح
-                  </button>
-                )}
+            {/* Secondary Subtitle / Slogan */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-300 flex items-center justify-between">
+                <span>العبارة التوضيحية أو الشعار النصي للنشاط (اختياري)</span>
+                <span className="text-[10px] text-amber-400 font-bold">
+                  {smartAnalysis.detectedCategory.name}
+                </span>
               </label>
+              
               <input
                 id="input-secondary-text"
                 type="text"
                 value={config.secondaryText}
                 onChange={(e) => onChange((p) => ({ ...p, secondaryText: e.target.value }))}
-                placeholder="مثال: رأيك يصنع الفرق ويطور خدماتنا دائماً"
-                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 min-h-[44px]"
+                placeholder="مثال: نشكّل من الألوميتال فناً وإتقاناً يدوم"
+                className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 min-h-[44px] font-medium"
               />
+
+              {/* Quick Slogan Suggestions Pills */}
+              {smartAnalysis.suggestedSecondaryTexts.length > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[11px] font-bold text-slate-400 block">
+                    شعارات ومقولات مقترحة تناسب نشاطك (اضغط للاختيار):
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {smartAnalysis.suggestedSecondaryTexts.map((slogan, sIdx) => {
+                      const isSelected = config.secondaryText === slogan;
+                      return (
+                        <button
+                          key={sIdx}
+                          type="button"
+                          onClick={() => onChange((p) => ({ ...p, secondaryText: slogan }))}
+                          className={`text-right text-[11px] px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-amber-500/20 border-amber-500 text-amber-300 font-bold shadow-sm ring-1 ring-amber-500/30'
+                              : 'bg-slate-850 hover:bg-slate-800 text-slate-300 border-slate-750 hover:border-amber-500/40'
+                          }`}
+                        >
+                          <span>{slogan}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Stars Configuration */}

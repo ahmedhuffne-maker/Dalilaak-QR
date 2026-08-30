@@ -7,6 +7,7 @@ export interface BusinessCategoryInfo {
   suggestedIcon: string;
   suggestedTheme: string;
   sampleSubtitles: string[];
+  slogans: string[]; // Unique domain taglines / slogans for the secondary text
   ctaTemplates: {
     main: string;
     secondary: string;
@@ -14,54 +15,123 @@ export interface BusinessCategoryInfo {
 }
 
 export const BUSINESS_CATEGORIES: BusinessCategoryInfo[] = [
+  // 1. ورش وأعمال الألوميتال والزجاج والشبابيك
+  {
+    id: 'aluminum-glass',
+    name: 'أعمال وورش الألوميتال والزجاج والشبابيك والمطابخ',
+    keywords: ['الوميتال', 'الومنيوم', 'الامنتال', 'ألوميتال', 'الومنتال', 'زجاج', 'واجهات', 'سكوريت', 'شبابيك', 'شباك', 'ابواب الوميتال', 'مطابخ الوميتال', 'تندات', 'شيش حصيره', 'aluminum', 'glass', 'windows', 'doors', 'facade'],
+    suggestedIcon: 'Wrench',
+    suggestedTheme: 'luxury-dark',
+    sampleSubtitles: ['ALUMINUM & GLASS ARCHITECTURE', 'MODERN ALUMINUM WORKSHOP', 'PREMIUM ALUMINUM & GLASS FAÇADES'],
+    slogans: [
+      'نشكّل من الألوميتال فناً وإتقاناً يدوم',
+      'دقة التصنيع ولمسات عصرية لمنزلك',
+      'أبواب وشبابيك بعزل فائق وجودة تدوم لأجيال',
+      'إبداع في التصميم ومتانة تفوق التوقعات'
+    ],
+    ctaTemplates: [
+      {
+        main: 'رأيك يهمنا في جودة وإتقان أعمالنا 🔧\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'نشكّل من الألوميتال فناً وإتقاناً يدوم'
+      },
+      {
+        main: 'كيف كان تشطيب وتركيب أعمالك معنا؟ ✨\nشاركنا تقييمك على خرائط Google',
+        secondary: 'دقة التصنيع ولمسات عصرية لمنزلك'
+      },
+      {
+        main: 'شرفتنا بزيارتك واختيارك لنا 🌟\nقيّمنا بـ 5 نجوم بخطوة واحدة',
+        secondary: 'أبواب وشبابيك بعزل فائق وجودة تدوم لأجيال'
+      }
+    ]
+  },
+
+  // 2. المكتبات والقرطاسية والطباعة والأدوات المدرسية
+  {
+    id: 'bookstore-stationery',
+    name: 'مكتبات وقرطاسية وخدمات طباعة وأدوات مدرسية',
+    keywords: ['مكتبة', 'مكتبه', 'قرطاسية', 'كتب', 'روايات', 'طباعة', 'تصوير مستندات', 'أدوات مدرسية', 'ادوات مكتبية', 'تجليد', 'bookstore', 'library', 'stationery', 'printing', 'books', 'school'],
+    suggestedIcon: 'Sparkles',
+    suggestedTheme: 'classic-paper',
+    sampleSubtitles: ['BOOKSTORE & STATIONERY', 'PRINTING & CREATIVE STATION', 'KNOWLEDGE & BOOK HAVEN'],
+    slogans: [
+      'بوابتك لعوالم المعرفة وشغف القراءة',
+      'كل ما يحتاجه إبداعك ومستقبلك الدراسي',
+      'حيث تلتقي الأفكار الملهمة بحب المعرفة',
+      'وجهتك الأولى للأدوات المدرسية والمطبوعات الراقية'
+    ],
+    ctaTemplates: [
+      {
+        main: 'نتمنى أن تجد معنا شغفك وإلهامك 📚\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'بوابتك لعوالم المعرفة وشغف القراءة'
+      },
+      {
+        main: 'رأيك يسعدنا ويدعم مسيرتنا ✨\nشاركنا تقييمك على خرائط Google',
+        secondary: 'كل ما يحتاجه إبداعك ومستقبلك الدراسي'
+      },
+      {
+        main: 'خدمتكم شرف وشغف دائم لنا 🌟\nامسح الكود وقيّم تجربتك معنا',
+        secondary: 'حيث تلتقي الأفكار الملهمة بحب المعرفة'
+      }
+    ]
+  },
+
+  // 3. غسيل وتلميع سيارات وعناية بالمركبات
   {
     id: 'car-wash',
     name: 'غسيل وتلميع سيارات وعناية بالمركبات',
-    keywords: ['غسيل', 'مغسلة', 'سيارات', 'تلميع', 'كار كير', 'نانو', 'سيراميك', 'بخار', 'تظليل', 'عازل', 'تنظيف سيارة', 'car wash', 'detailing', 'auto care', 'ceramic'],
+    keywords: ['غسيل', 'مغسلة سيارات', 'سيارات', 'تلميع', 'كار كير', 'نانو', 'سيراميك', 'بخار', 'تظليل', 'عازل', 'تنظيف سيارة', 'car wash', 'detailing', 'auto care', 'ceramic'],
     suggestedIcon: 'Car',
     suggestedTheme: 'classic-paper',
-    sampleSubtitles: ['CAR WASH & DETAILING', 'AUTO CARE & NANO CERAMIC', 'PREMIUM STEAM CAR WASH', 'EXPRESS CAR WASH'],
+    sampleSubtitles: ['CAR WASH & DETAILING', 'AUTO CARE & NANO CERAMIC', 'PREMIUM STEAM CAR WASH'],
+    slogans: [
+      'نعتني ببريق سيارتك كأنها سيارتنا',
+      'لمعان استثنائي وحماية فائقة تدوم طويلاً',
+      'عناية متكاملة تليق بسيارتك وأناقتها',
+      'خدمة سريعة ونظافة احترافية بأدق التفاصيل'
+    ],
     ctaTemplates: [
       {
-        main: 'كيف كانت لمعة ونظافة سيارتك اليوم في {name}؟ ✨\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
-        secondary: 'رأيك يهمنا دائماً لنحافظ على بريق ولمعان سيارتك بأعلى جودة'
+        main: 'كيف كانت لمعة ونظافة سيارتك اليوم؟ ✨\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'نعتني ببريق سيارتك كأنها سيارتنا'
       },
       {
-        main: 'سيارتك تستحق العناية الفائقة دائماً 🚗\nشاركنا رأيك وتقييمك على خرائط Google',
-        secondary: 'نسعى دائماً لتقديم أقصى درجات النظافة والبريق الاستثنائي'
+        main: 'رأيك يهمنا في نظافة ولمعان سيارتك 🚗\nقيّمنا على خرائط Google',
+        secondary: 'لمعان استثنائي وحماية فائقة تدوم طويلاً'
       },
       {
-        main: 'لأن لمعة سيارتك شغفنا في {name} 🌟\nامسح الكود واترك تقييمك الكريم',
-        secondary: 'خدمة احترافية تليق بسيارتك وبثقتكم الغالية'
-      },
-      {
-        main: 'شاركنا انطباعك عن خدمة الغسيل والتلميع\nبمسحة سريعة لرمز الـ QR',
-        secondary: 'فريقنا يسعد دائماً برضاكم ونسعى للأفضل معكم'
+        main: 'سيارتك تستحق العناية الفائقة دائماً 🌟\nشاركنا رأيك بمسحة سريعة',
+        secondary: 'عناية متكاملة تليق بسيارتك وأناقتها'
       }
     ]
   },
+
+  // 4. صيانة وميكانيكا وورش سيارات
   {
     id: 'auto-mechanic',
-    name: 'صيانة وميكانيكا وورش سيارات',
-    keywords: ['ميكانيكا', 'ورشة', 'صيانة سيارات', 'فحص كمبيوتر', 'كهرباء سيارات', 'مركز صيانة', 'قطع غيار', 'زيوت', 'إطارات', 'بنشر', 'auto repair', 'service center', 'mechanic'],
+    name: 'صيانة وميكانيكا وورش سيارات وقطع غيار',
+    keywords: ['ميكانيكا', 'ورشة سيارات', 'صيانة سيارات', 'فحص كمبيوتر', 'كهرباء سيارات', 'مركز صيانة', 'قطع غيار', 'زيوت', 'إطارات', 'عفشة', 'auto repair', 'service center', 'mechanic'],
     suggestedIcon: 'Wrench',
     suggestedTheme: 'luxury-dark',
     sampleSubtitles: ['ADVANCED AUTO CARE CENTER', 'AUTO REPAIR & DIAGNOSTICS', 'CAR MAINTENANCE SPECIALISTS'],
+    slogans: [
+      'خبرة وثقة تضمن أمان رحلتك على الطريق',
+      'تشخيص دقيق وصيانة معتمدة لراحة بالك',
+      'أداء مثالي لسيارتك بأيدي أمهر الفنيين',
+      'قطع أصلية وضمان يحمي سيارتك دائماً'
+    ],
     ctaTemplates: [
       {
-        main: 'ثقتكم وأمان سيارتكم غايتنا في {name} 🔧\nامسح الرمز وقيّم جودة الصيانة بـ 5 نجوم ★',
-        secondary: 'نعتز بثقتكم ونضمن لكم صيانة دقيقة وقطع أصلية معتمدة'
+        main: 'ثقتكم وأمانكم غايتنا الأولى 🔧\nامسح الرمز وقيّم جودة الصيانة بـ 5 نجوم ★',
+        secondary: 'خبرة وثقة تضمن أمان رحلتك على الطريق'
       },
       {
-        main: 'كيف كانت تجربة صيانة سيارتك معنا اليوم؟\nامسح الكود وشاركنا رأيك على Google Maps',
-        secondary: 'رأيك يساعدنا في الحفاظ على أعلى معايير الجودة والأمان'
-      },
-      {
-        main: 'خدمة صيانة معتمدة لراحتكم وأمانكم 🚗\nقيّمنا على خرائط جوجل بخطوة واحدة',
-        secondary: 'فريق فني متخصص لخدمتكم بأسرع وقت وأفضل الأسعار'
+        main: 'كيف كانت تجربة صيانة سيارتك معنا؟ 🚗\nشاركنا رأيك على Google Maps',
+        secondary: 'تشخيص دقيق وصيانة معتمدة لراحة بالك'
       }
     ]
   },
+
+  // 5. مقاهي وكافيهات وقهوة مختصة ومحامص
   {
     id: 'cafe-coffee',
     name: 'مقاهي وكافيهات وقهوة مختصة ومحامص',
@@ -69,159 +139,159 @@ export const BUSINESS_CATEGORIES: BusinessCategoryInfo[] = [
     suggestedIcon: 'Coffee',
     suggestedTheme: 'luxury-dark',
     sampleSubtitles: ['SPECIALTY COFFEE & ROASTERY', 'ARTISAN COFFEE BAR', 'PREMIUM SPECIALTY CAFE'],
+    slogans: [
+      'فنجان يُصنع بشغف ويبقى في الذاكرة',
+      'أجواء دافئة ومحاصيل مختصة تليق بذوقك',
+      'بداية يومك تبدأ من رشفة قهوة مثالية',
+      'نبتكر في كل قطرة قهوة تجربة فريدة'
+    ],
     ctaTemplates: [
       {
-        main: 'كيف كانت قهوتك وتجربتك اليوم في {name}؟ ☕\nامسح الرمز وقيّمنا بـ 5 نجوم على Google',
-        secondary: 'يسعدنا دائماً استقبال رأيك ومشاركتك لأجوائنا المميزة'
+        main: 'كيف كانت قهوتك وتجربتك معنا اليوم؟ ☕\nامسح الرمز وقيّمنا بـ 5 نجوم على Google',
+        secondary: 'فنجان يُصنع بشغف ويبقى في الذاكرة'
       },
       {
         main: 'صُنعت قهوتك بكل حُب وإتقان ✨\nشاركنا رأيك وانطباعك بمسحة سريعة',
-        secondary: 'محاصيل مختصة وتجربة استثنائية لكل عشاق القهوة'
+        secondary: 'أجواء دافئة ومحاصيل مختصة تليق بذوقك'
       },
       {
-        main: 'يومك الجميل يكتمل برأيك وتقييمك 🌟\nامسح الرمز واترك 5 نجوم في خرائط جوجل',
-        secondary: 'نسعى دائماً لتقديم أشهى المشروبات وأرقى الجلسات'
-      },
-      {
-        main: 'تجربة قهوة لا تُنسى في {name} ☕\nقيّمنا وكن جزءاً من عائلتنا',
-        secondary: 'رأيكم يصنع فارقنا ويلهم باريستاتنا للإبداع اليومي'
+        main: 'يومك الجميل يكتمل برأيك وتقييمك 🌟\nقيّمنا على خرائط Google',
+        secondary: 'بداية يومك تبدأ من رشفة قهوة مثالية'
       }
     ]
   },
+
+  // 6. مطاعم ومأكولات ومشويات
   {
     id: 'restaurant-dining',
-    name: 'مطاعم ومأكولات ومشويات',
+    name: 'مطاعم ومأكولات ومشويات وشاورما',
     keywords: ['مطعم', 'مأكولات', 'مشاوي', 'مشويات', 'شاورما', 'طعام', 'أكلات', 'شعبي', 'restaurant', 'dining', 'grill', 'kitchen', 'food'],
     suggestedIcon: 'Utensils',
     suggestedTheme: 'burgundy-luxury',
     sampleSubtitles: ['ORIENTAL RESTAURANT & GRILL', 'FINE DINING & CATERING', 'TRADITIONAL & MODERN CUISINE'],
+    slogans: [
+      'نكهات أصيلة تُطهى بحرفية وكرم الضيافة',
+      'أطباق طازجة كل يوم لتسعد حواسك',
+      'طعم يجمع الأحباب وذكريات لا تُنسى',
+      'سر وصفتنا في جودة المكونات وحُب الطهي'
+    ],
     ctaTemplates: [
       {
-        main: 'بالهناء والشفاء! كيف كانت نكهة أطباقنا في {name}؟ 🍽️\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
-        secondary: 'نعتز بخدمتكم ونطهو أشهى الوصفات الطازجة يومياً بحب وإتقان'
+        main: 'بالهناء والشفاء! كيف كانت نكهة أطباقنا؟ 🍽️\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'نكهات أصيلة تُطهى بحرفية وكرم الضيافة'
       },
       {
         main: 'طعم لا يُنسى وتجربة مميزة ✨\nشاركنا رأيك وتقييمك على خرائط Google',
-        secondary: 'تقييمك يسعد فريق الطهاة والخدمة ويحفزنا للأفضل دائماً'
+        secondary: 'أطباق طازجة كل يوم لتسعد حواسك'
       },
       {
-        main: 'أهلاً بكم دائماً في {name}! 🌟\nامسح الكود واترك انطباعك الكريم',
-        secondary: 'أجود المكونات الطازجة وخدمة راقية تليق بحضرتكم'
+        main: 'أهلاً بكم دائماً! تسعدنا زيارتكم 🌟\nامسح الكود وقيّم ضيافتنا',
+        secondary: 'طعم يجمع الأحباب وذكريات لا تُنسى'
       }
     ]
   },
+
+  // 7. بيتزا وباستا ومأكولات إيطالية
   {
     id: 'pizza-italian',
-    name: 'بيتزا وباستا ومأكولات إيطالية',
-    keywords: ['بيتزا', 'باستا', 'إيطالي', 'ايطالي', 'معجنات', 'فرن', 'pizza', 'pasta', 'italian'],
+    name: 'بيتزا وباستا ومأكولات إيطالية ومعجنات',
+    keywords: ['بيتزا', 'باستا', 'إيطالي', 'ايطالي', 'معجنات', 'فرن', 'فطائر', 'pizza', 'pasta', 'italian'],
     suggestedIcon: 'Pizza',
     suggestedTheme: 'burgundy-luxury',
     sampleSubtitles: ['ARTISAN PIZZA & PASTA', 'AUTHENTIC ITALIAN CUISINE', 'WOOD FIRE PIZZA'],
+    slogans: [
+      'عجينة مخبوزة على الحطب بأصالة إيطالية',
+      'قرمشة ونكهات ساحرة من قلب إيطاليا',
+      'صوصات طازجة وجبنة غنية في كل قضمة'
+    ],
     ctaTemplates: [
       {
-        main: 'كيف كانت نكهة البيتزا والباستا اليوم في {name}؟ 🍕\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
-        secondary: 'عجينة مخمرة طبيعياً ومخبوزة على الحطب بأصالة إيطالية'
+        main: 'كيف كانت نكهة البيتزا والباستا اليوم؟ 🍕\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'عجينة مخبوزة على الحطب بأصالة إيطالية'
       },
       {
         main: 'قرمشة وطعم إيطالي أصيل! ✨\nشاركنا رأيك وتقييمك على خرائط Google',
-        secondary: 'نسعد دائماً بمشاركتك لتجربة الطعام الفريدة معنا'
+        secondary: 'قرمشة ونكهات ساحرة من قلب إيطاليا'
       }
     ]
   },
+
+  // 8. برجر ووجبات سريعة
   {
     id: 'burger-fastfood',
-    name: 'برجر ووجبات سريعة ومقرمشات',
-    keywords: ['برجر', 'فاست فود', 'وجبات سريعة', 'ساندوتش', 'بطاطس', 'كرسبي', 'burger', 'fast food', 'crispy', 'fries'],
+    name: 'برجر ووجبات سريعة ومقرمشات وساندوتشات',
+    keywords: ['برجر', 'فاست فود', 'وجبات سريعة', 'ساندوتش', 'بطاطس', 'كرسبي', 'برغر', 'burger', 'fast food', 'crispy', 'fries'],
     suggestedIcon: 'Burger',
     suggestedTheme: 'luxury-dark',
     sampleSubtitles: ['SMOKE BURGER & CRISPY FRIES', 'ARTISAN BURGER STATION', 'PREMIUM HANDCRAFTED BURGERS'],
+    slogans: [
+      'طعم الشواء الحقيقي مع صوصاتنا المبتكرة',
+      'وجبات طازجة ومقرمشة تُرضي جوعك وشغفك',
+      'لحم بلدي طازج 100% يُحضر أمامك بحرفية'
+    ],
     ctaTemplates: [
       {
-        main: 'طعم البرجر الحقيقي لا يُقاوم! 🍔\nامسح الرمز وقيّمنا بـ 5 نجوم في {name}',
-        secondary: 'لحوم طازجة 100% يومياً وصوصاتنا الخاصة المبتكرة'
+        main: 'طعم البرجر الحقيقي لا يُقاوم! 🍔\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'طعم الشواء الحقيقي مع صوصاتنا المبتكرة'
       },
       {
-        main: 'كيف كان قرمشة وطعم وجبتك اليوم؟ 🍟\nشاركنا تقييمك على خرائط Google',
-        secondary: 'نعدكم بألذ تجربة برجر ترضي شغفكم دائماً'
+        main: 'كيف كانت قرمشة وطعم وجبتك اليوم؟ 🍟\nشاركنا تقييمك على خرائط Google',
+        secondary: 'وجبات طازجة ومقرمشة تُرضي جوعك وشغفك'
       }
     ]
   },
+
+  // 9. حلويات ومخابز وآيس كريم وشوكولاتة
   {
     id: 'bakery-sweets',
     name: 'حلويات ومخابز وآيس كريم وشوكولاتة',
-    keywords: ['حلويات', 'حلى', 'مخبز', 'مخبوزات', 'كيك', 'شوكولاته', 'شوكولاتة', 'آيس كريم', 'ايس كريم', 'دونات', 'bakery', 'sweets', 'cake', 'pastry', 'dessert', 'ice cream'],
+    keywords: ['حلويات', 'حلى', 'مخبز', 'مخبوزات', 'كيك', 'شوكولاته', 'شوكولاتة', 'آيس كريم', 'ايس كريم', 'دونات', 'سينابون', 'bakery', 'sweets', 'cake', 'pastry', 'dessert', 'ice cream'],
     suggestedIcon: 'Cake',
     suggestedTheme: 'royal-navy',
     sampleSubtitles: ['FINE PASTRY & SWEETS', 'ARTISAN BAKERY & CAKES', 'PREMIUM CHOCOLATE & DESSERTS'],
+    slogans: [
+      'حلاوة تُبهج قلبك وتُحلّي أوقاتك السعيدة',
+      'مخبوزات طازجة من الفرن يومياً بكل حُب',
+      'نصنع من الشوكولاتة والحلويات قطعاً فنية'
+    ],
     ctaTemplates: [
       {
-        main: 'حليت يومك معنا في {name}؟ 🍰\nامسح الرمز وشاركنا تقييمك بـ 5 نجوم ★',
-        secondary: 'أشهى الحلويات والمخبوزات الطازجة المصنوعة بأرقى المكونات'
+        main: 'حلّيت يومك معنا؟ 🍰\nامسح الرمز وشاركنا تقييمك بـ 5 نجوم ★',
+        secondary: 'حلاوة تُبهج قلبك وتُحلّي أوقاتك السعيدة'
       },
       {
         main: 'لحظات حلوة ومذاق يسعد القلب ✨\nقيّمنا على خرائط Google بلمسة واحدة',
-        secondary: 'نتشرف دائماً بمشاركتكم لأفراحكم ومناسباتكم السعيدة'
+        secondary: 'مخبوزات طازجة من الفرن يومياً بكل حُب'
       }
     ]
   },
-  {
-    id: 'medical-health',
-    name: 'مجمعات طبية وعيادات ومستشفيات ومختبرات',
-    keywords: ['مجمع طبي', 'عيادة', 'طبي', 'دكتور', 'طبيب', 'مستشفى', 'مركز طبي', 'صيدلية', 'مختبر', 'تحاليل', 'clinic', 'medical', 'hospital', 'doctor', 'pharma', 'health'],
-    suggestedIcon: 'Stethoscope',
-    suggestedTheme: 'modern-white',
-    sampleSubtitles: ['ELITE MEDICAL COMPLEX', 'SPECIALIZED HEALTH CARE CLINIC', 'ADVANCED MEDICAL CENTER'],
-    ctaTemplates: [
-      {
-        main: 'صحتكم ورضاكم غايتنا الأولى في {name} 🩺\nامسح الرمز وقيّم تجربتك الطبية معنا',
-        secondary: 'رأيكم يهمنا لتحسين جودة الرعاية والخدمات الطبية باستمرار'
-      },
-      {
-        main: 'نتمنى لكم دوام الصحة والعافية دائماً 🌿\nشاركنا تقييمك لزيارتك على خرائط Google',
-        secondary: 'نخبة من الأطباء الاستشاريين وأحدث الأجهزة الطبية لرعايتكم'
-      },
-      {
-        main: 'كيف كانت جودة الخدمة والرعاية اليوم؟\nامسح الكود واترك تقييمك بـ 5 نجوم ★',
-        secondary: 'نلتزم بأعلى معايير السلامة والجودة والتعقيم الطبي'
-      }
-    ]
-  },
-  {
-    id: 'dental-clinic',
-    name: 'طب وتجميل الأسنان وهوليوود سمايل',
-    keywords: ['أسنان', 'اسنان', 'تجميل أسنان', 'تقويم', 'زراعة أسنان', 'هوليوود سمايل', 'ابتسامة', 'dental', 'teeth', 'dentist', 'smile'],
-    suggestedIcon: 'Tooth',
-    suggestedTheme: 'modern-white',
-    sampleSubtitles: ['HOLLYWOOD SMILE DENTAL CLINIC', 'ADVANCED DENTAL & ORTHODONTIC CENTER', 'DENTAL CARE SPECIALISTS'],
-    ctaTemplates: [
-      {
-        main: 'ابتسامتك الجميلة سر سعادتنا في {name} ✨\nامسح الرمز وشاركنا تقييمك بـ 5 نجوم ★',
-        secondary: 'أحدث تقنيات طب وتجميل الأسنان بدون ألم وبأعلى معايير الجودة'
-      },
-      {
-        main: 'كيف كانت زيارتك وتجربة علاج أسنانك اليوم؟ 🦷\nقيّمنا على خرائط Google بخطوة سريعة',
-        secondary: 'نعتني بابتسامتكم ونمنحكم الثقة والإشراقة التي تستحقونها'
-      }
-    ]
-  },
+
+  // 10. صالونات الحلاقة والعناية بالرجل
   {
     id: 'barber-gents',
     name: 'صالونات الحلاقة والعناية بالرجل',
-    keywords: ['صالون رجالي', 'حلاقة', 'حلاق', 'باربر', 'تجميل رجالي', 'قص شعر', 'لحية', 'barber', 'salon', 'gents salon', 'grooming'],
+    keywords: ['صالون رجالي', 'حلاقة', 'حلاق', 'باربر', 'تجميل رجالي', 'قص شعر', 'لحية', 'تصفيف', 'barber', 'salon', 'gents salon', 'grooming'],
     suggestedIcon: 'Scissors',
     suggestedTheme: 'royal-navy',
     sampleSubtitles: ['PRINCE GENTS SALON & SPA', 'VIP BARBERSHOP & GROOMING', 'ROYAL GENTS CARE'],
+    slogans: [
+      'إطلالة أنيقة وعناية ملكية تليق بالرجل العصري',
+      'حلاقة دقيقة واهتمام بأدق تفاصيل وسامتك',
+      'أعلى معايير النظافة والتعقيم لراحتك التامة'
+    ],
     ctaTemplates: [
       {
-        main: 'نعيماً! كيف كانت إطلالتك اليوم في {name}؟ ✂️\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
-        secondary: 'إطلالتكم المميزة وأناقتكم هي شغفنا وفخرنا الدائم'
+        main: 'نعيماً! كيف كانت إطلالتك اليوم معنا؟ ✂️\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'إطلالة أنيقة وعناية ملكية تليق بالرجل العصري'
       },
       {
-        main: 'شاركونا تقييمكم لخدمات العناية والحلاقة 💈\nامسح الرمز على خرائط Google',
-        secondary: 'أحدث صيحات القص والتعقيم الطبي لراحتكم وأناقتكم'
+        main: 'شاركونا تقييمكم لخدمات الحلاقة 💈\nامسح الرمز على خرائط Google',
+        secondary: 'حلاقة دقيقة واهتمام بأدق تفاصيل وسامتك'
       }
     ]
   },
+
+  // 11. صالونات ومشاغل التجميل النسائي
   {
     id: 'ladies-beauty-spa',
     name: 'صالونات ومشاغل التجميل والسبا النسائي',
@@ -229,53 +299,149 @@ export const BUSINESS_CATEGORIES: BusinessCategoryInfo[] = [
     suggestedIcon: 'Flower2',
     suggestedTheme: 'emerald-luxury',
     sampleSubtitles: ['LUXURY LADIES SALON & SPA', 'BEAUTY & WELLNESS LOUNGE', 'ROYAL WOMEN CARE & BEAUTY'],
+    slogans: [
+      'جمالكِ ورقتكِ في أيدٍ خبيرة ومحترفة',
+      'عناية راقية تبرز إشراقتكِ وسحركِ الطبيعي',
+      'واحتكِ الخاصة للدلال والراحة والجمال المتألق'
+    ],
     ctaTemplates: [
       {
-        main: 'تألقي بجمالك وإشراقتك في {name} 🌸\nامسحي الرمز وشاركينا تقييمك بـ 5 نجوم ★',
-        secondary: 'نسعى دائماً لتقديم أقصى درجات الدلال والعناية الملكية لجمالك'
+        main: 'تألقي بجمالك وإشراقتك الساحرة 🌸\nامسحي الرمز وشاركينا تقييمك بـ 5 نجوم ★',
+        secondary: 'جمالكِ ورقتكِ في أيدٍ خبيرة ومحترفة'
       },
       {
-        main: 'رأيك يسعدنا ويزيدنا تألقاً وإبداعاً ✨\nشاركينا انطباعك وتجربتك على خرائط Google',
-        secondary: 'خبراء تجميل وعناية بالبشرة والشعر بأرقى الماركات العالمية'
+        main: 'رأيك يسعدنا ويزيدنا تألقاً وإبداعاً ✨\nشاركينا انطباعك وتجربتك على Google Maps',
+        secondary: 'عناية راقية تبرز إشراقتكِ وسحركِ الطبيعي'
       }
     ]
   },
+
+  // 12. عطور ومستحضرات تجميل وبخور
   {
     id: 'perfume-cosmetics',
-    name: 'عطور ومستحضرات تجميل وبخور',
-    keywords: ['عطور', 'عطر', 'بخور', 'مسك', 'عود', 'دخون', 'مستحضرات تجميل', 'perfume', 'fragrance', 'oud', 'musk', 'cosmetics'],
+    name: 'عطور ومستحضرات تجميل وبخور ومسك',
+    keywords: ['عطور', 'عطر', 'بخور', 'مسك', 'عود', 'دخون', 'مستحضرات تجميل', 'مكياج', 'perfume', 'fragrance', 'oud', 'musk', 'cosmetics'],
     suggestedIcon: 'Sparkles',
     suggestedTheme: 'emerald-luxury',
     sampleSubtitles: ['ROYAL PERFUMES & OUD', 'LUXURY FRAGRANCE BOUTIQUE', 'DAR AL OUD & PERFUMES'],
+    slogans: [
+      'عطرٌ يروي حكايتك ويترك أثراً ساحراً لا يُنسى',
+      'نفحات تأسر الحواس بأصالة تدوم طويلاً',
+      'أفخر خلطات العود والمسك بنقاء ملكي استثنائي'
+    ],
     ctaTemplates: [
       {
-        main: 'عطّر يومنا برأيك وتقييمك في {name} ✨\nامسح الرمز وشاركنا تجربتك العطرية',
-        secondary: 'فخامة الرائحة وأصالة المكونات الملكية تدوم طويلاً'
+        main: 'عطّر يومنا برأيك وتقييمك الكريم ✨\nامسح الرمز وشاركنا تجربتك العطرية',
+        secondary: 'عطرٌ يروي حكايتك ويترك أثراً ساحراً لا يُنسى'
       },
       {
-        main: 'ثقتكم وذوقكم الرفيع مصدر فخرنا 🌟\nامسح الكود وقيّمنا بـ 5 نجوم على Google',
-        secondary: 'نبتكر أزكى الروائح والخلطات الشرقية والغربية الفاخرة'
+        main: 'ذوقكم الرفيع مصدر فخرنا الدائم 🌟\nقيّمنا بـ 5 نجوم على Google',
+        secondary: 'نفحات تأسر الحواس بأصالة تدوم طويلاً'
       }
     ]
   },
+
+  // 13. طب وتجميل الأسنان
   {
-    id: 'jewelry-gold',
-    name: 'ذهب ومجوهرات وألماس وساعات فاخرة',
-    keywords: ['ذهب', 'مجوهرات', 'ألماس', 'الماس', 'فضة', 'ساعات', 'مجوهرات فاخرة', 'gold', 'jewelry', 'diamond', 'watches', 'silver'],
-    suggestedIcon: 'Gem',
-    suggestedTheme: 'classic-paper',
-    sampleSubtitles: ['ROYAL GOLD & LUXURY JEWELRY', 'FINE DIAMOND & JEWELRY BOUTIQUE', 'PREMIUM WATCHES & GOLD'],
+    id: 'dental-clinic',
+    name: 'طب وتجميل الأسنان وهوليوود سمايل',
+    keywords: ['أسنان', 'اسنان', 'تجميل أسنان', 'تقويم', 'زراعة أسنان', 'هوليوود سمايل', 'ابتسامة', 'طبيب أسنان', 'dental', 'teeth', 'dentist', 'smile'],
+    suggestedIcon: 'Tooth',
+    suggestedTheme: 'modern-white',
+    sampleSubtitles: ['HOLLYWOOD SMILE DENTAL CLINIC', 'ADVANCED DENTAL & ORTHODONTIC CENTER', 'DENTAL CARE SPECIALISTS'],
+    slogans: [
+      'ابتسامتك الواثقة والمشرقة هي سر تميزنا',
+      'عناية بأحدث التقنيات لأسنان صحية وناصعة بدون ألم',
+      'نمنحك الابتسامة التي طالما حلمت بها بكل ثقة'
+    ],
     ctaTemplates: [
       {
-        main: 'بريق الفخامة يكتمل برأيكم الكريم في {name} 💎\nامسح الرمز لتقييم زيارتكم بـ 5 نجوم ★',
-        secondary: 'تصاميم استثنائية ونقاء أصيل يليق بذوقكم الرفيع'
+        main: 'ابتسامتك الجميلة سر سعادتنا ✨\nامسح الرمز وشاركنا تقييمك بـ 5 نجوم ★',
+        secondary: 'ابتسامتك الواثقة والمشرقة هي سر تميزنا'
       },
       {
-        main: 'نسعد دائماً باختياركم وتوثيق أجمل لحظاتكم ✨\nشاركنا رأيك وانطباعك على خرائط Google',
-        secondary: 'أرقى قطع الذهب والمجوهرات الملكية المعتمدة'
+        main: 'كيف كانت تجربتك في علاج وتجميل أسنانك؟ 🦷\nقيّمنا على خرائط Google بخطوة سريعة',
+        secondary: 'عناية بأحدث التقنيات لأسنان صحية وناصعة بدون ألم'
       }
     ]
   },
+
+  // 14. مجمعات طبية وعيادات ومستشفيات
+  {
+    id: 'medical-health',
+    name: 'مجمعات طبية وعيادات ومستشفيات ومختبرات',
+    keywords: ['مجمع طبي', 'عيادة', 'طبي', 'دكتور', 'طبيب', 'مستشفى', 'مركز طبي', 'صيدلية', 'مختبر', 'تحاليل', 'اشعة', 'clinic', 'medical', 'hospital', 'doctor', 'health'],
+    suggestedIcon: 'Stethoscope',
+    suggestedTheme: 'modern-white',
+    sampleSubtitles: ['ELITE MEDICAL COMPLEX', 'SPECIALIZED HEALTH CARE CLINIC', 'ADVANCED MEDICAL CENTER'],
+    slogans: [
+      'رعايتكم الصحية أمانتنا وعافيتكم غايتنا الأولى',
+      'كفاءة طبية ورعاية إنسانية تعيد لك ولعائلتك العافية',
+      'أحدث التجهيزات الطبية وكوادر استشارية متخصصة'
+    ],
+    ctaTemplates: [
+      {
+        main: 'صحتكم وسلامتكم غايتنا الأولى 🩺\nامسح الرمز وقيّم تجربتك الطبية معنا',
+        secondary: 'رعايتكم الصحية أمانتنا وعافيتكم غايتنا الأولى'
+      },
+      {
+        main: 'نتمنى لكم دوام الصحة والعافية دائماً 🌿\nشاركنا تقييمك لزيارتك على خرائط Google',
+        secondary: 'كفاءة طبية ورعاية إنسانية تعيد لك ولعائلتك العافية'
+      }
+    ]
+  },
+
+  // 15. صيدليات ومستحضرات دوائية
+  {
+    id: 'pharmacy',
+    name: 'صيدليات ومستحضرات دوائية ورعاية صحية',
+    keywords: ['صيدلية', 'صيدليه', 'دواء', 'علاج', 'فيتامينات', 'مستلزمات طبية', 'pharmacy', 'drugstore', 'medicine'],
+    suggestedIcon: 'Pill',
+    suggestedTheme: 'modern-white',
+    sampleSubtitles: ['COMMUNITY PHARMACY & CARE', 'WELLNESS & HEALTH PHARMACY', 'TRUSTED FAMILY PHARMACY'],
+    slogans: [
+      'صحتكم أولويتنا وخدمتنا معكم على مدار الساعة',
+      'استشارة دوائية موثوقة وعناية صحية متكاملة',
+      'صيدليتكم الموثوقة لكل احتياجات الأسرة الصحية'
+    ],
+    ctaTemplates: [
+      {
+        main: 'نسعد دائماً برعايتكم وتوفير أدويتكم 💊\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'صحتكم أولويتنا وخدمتنا معكم على مدار الساعة'
+      },
+      {
+        main: 'كيف كانت استشارتك وخدمتنا اليوم؟ 🌿\nشاركنا رأيك على خرائط Google',
+        secondary: 'استشارة دوائية موثوقة وعناية صحية متكاملة'
+      }
+    ]
+  },
+
+  // 16. نجارة وأثاث وديكور ومفروشات
+  {
+    id: 'carpentry-furniture',
+    name: 'نجارة وأثاث ومطابخ وديكور ومفروشات',
+    keywords: ['نجارة', 'نجار', 'أثاث', 'اثاث', 'موبيليا', 'مطابخ خشب', 'غرف نوم', 'دواليب', 'مفروشات', 'ستائر', 'furniture', 'carpentry', 'wood', 'kitchens'],
+    suggestedIcon: 'Wrench',
+    suggestedTheme: 'luxury-dark',
+    sampleSubtitles: ['FINE WOODWORK & FURNITURE', 'MODERN KITCHENS & BEDROOMS', 'CUSTOM WOOD CRAFT'],
+    slogans: [
+      'إبداع في نحت الخشب وحرفية يد تدوم لأجيال',
+      'أثاث خشبي راقٍ بتفاصيل صُنعت خصيصاً لذوقك',
+      'نحوّل الخشب إلى قطع فنية تنبض بالفخامة والدفء'
+    ],
+    ctaTemplates: [
+      {
+        main: 'رأيك يهمنا في دقة وجودة تشطيب أعمالنا 🪵\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'إبداع في نحت الخشب وحرفية يد تدوم لأجيال'
+      },
+      {
+        main: 'كيف كانت جودة الأثاث والتسليم؟ ✨\nشاركنا تقييمك على خرائط Google',
+        secondary: 'أثاث خشبي راقٍ بتفاصيل صُنعت خصيصاً لذوقك'
+      }
+    ]
+  },
+
+  // 17. نوادي رياضية وجيم ولياقة بدنية
   {
     id: 'fitness-gym',
     name: 'نوادي رياضية وجيم ولياقة بدنية',
@@ -283,71 +449,49 @@ export const BUSINESS_CATEGORIES: BusinessCategoryInfo[] = [
     suggestedIcon: 'Dumbbell',
     suggestedTheme: 'luxury-dark',
     sampleSubtitles: ['POWER FITNESS CLUB & GYM', 'CROSSFIT & BODYBUILDING ARENA', 'ELITE HEALTH & FITNESS'],
+    slogans: [
+      'قوتك وصحتك تبدأ هنا.. واصل تحدي أهدافك',
+      'مدربون محترفون وبيئة تحفيزية لأفضل نسخة منك',
+      'أسلوب حياة صحي ولياقة تدوم مع أفضل التجهيزات'
+    ],
     ctaTemplates: [
       {
-        main: 'طاقتكم وإنجازكم هو دافعنا في {name}! 🏋️\nامسح الرمز وقيّم تجربتك الرياضية معنا',
-        secondary: 'نساعدك لبناء أسلوب حياة رياضي متكامل بأحدث الأجهزة والمدربين'
+        main: 'طاقتكم وإنجازكم هو دافعنا الدائم! 🏋️\nامسح الرمز وقيّم تجربتك الرياضية معنا',
+        secondary: 'قوتك وصحتك تبدأ هنا.. واصل تحدي أهدافك'
       },
       {
         main: 'كيف كان تمرينك وأجواء النادي اليوم؟ 🔥\nشاركنا رأيك بـ 5 نجوم على خرائط Google',
-        secondary: 'بيئة تدريب محفزة وبرامج لياقة مخصصة لتحقيق أهدافك'
+        secondary: 'مدربون محترفون وبيئة تحفيزية لأفضل نسخة منك'
       }
     ]
   },
+
+  // 18. محلات الزهور والهدايا
   {
-    id: 'real-estate-contracting',
-    name: 'عقارات ومقاولات وتطوير عقاري وتصميم داخلي',
-    keywords: ['عقارات', 'عقار', 'مقاولات', 'تطوير عقاري', 'وساطة', 'مكتب عقاري', 'فلل', 'شقق', 'ديكور', 'تصميم داخلي', 'تشطيب', 'real estate', 'properties', 'contracting', 'interior design'],
-    suggestedIcon: 'Building2',
-    suggestedTheme: 'luxury-dark',
-    sampleSubtitles: ['SARH REAL ESTATE INVESTMENT', 'MODERN CONTRACTING & INTERIOR', 'PREMIUM PROPERTY DEVELOPMENT'],
+    id: 'flowers-gifts',
+    name: 'محلات الزهور والهدايا وتنسيق الحفلات',
+    keywords: ['ورد', 'زهور', 'هدايا', 'تغليف هدايا', 'تنسيق ورد', 'بوكيه', 'حفلات', 'flowers', 'gifts', 'florist', 'bouquets'],
+    suggestedIcon: 'Flower2',
+    suggestedTheme: 'emerald-luxury',
+    sampleSubtitles: ['LUXURY FLOWERS & GIFTS', 'CREATIVE FLORAL BOUTIQUE', 'ELEGANT GIFTS & ARRANGEMENTS'],
+    slogans: [
+      'نصيغ مشاعرك بأجمل باقات الورد والهدايا الأنيقة',
+      'لكل مناسبة حكاية نرويها بلمسة ورد ساحرة',
+      'زهور طبيعية منتقاة بعناية لتبهج من تحب'
+    ],
     ctaTemplates: [
       {
-        main: 'ثقتكم ركيزتنا الأولى في {name} 🏢\nامسح الرمز لتقييم مستشارينا وخدمتنا',
-        secondary: 'نبتكر حلولاً عقارية وهندسية متميزة تلبي تطلعاتكم المستقبلية'
+        main: 'نسعد بمشاركتكم لأجمل مناسباتكم 🌸\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'نصيغ مشاعرك بأجمل باقات الورد والهدايا الأنيقة'
       },
       {
-        main: 'شراكة وثقة مستدامة لبناء المستقبل ✨\nقيّمنا على خرائط Google بـ 5 نجوم',
-        secondary: 'التزام بالمواعيد وجودة تشطيب تفوق التوقعات'
+        main: 'كيف كانت لمسة باقتنا وهديتنا اليوم؟ ✨\nشاركنا تقييمك على خرائط Google',
+        secondary: 'لكل مناسبة حكاية نرويها بلمسة ورد ساحرة'
       }
     ]
   },
-  {
-    id: 'travel-tourism-hotels',
-    name: 'سياحة وسفر وحجوزات وفنادق وشاليهات',
-    keywords: ['سياحة', 'سفر', 'حجوزات', 'طيران', 'فندق', 'فنادق', 'شاليهات', 'منتجع', 'رحلات', 'travel', 'tourism', 'hotel', 'resort', 'flight', 'booking'],
-    suggestedIcon: 'Plane',
-    suggestedTheme: 'royal-navy',
-    sampleSubtitles: ['WORLD HORIZON TRAVEL & TOURISM', 'LUXURY HOTEL & RESORTS', 'VIP TRAVEL & FLIGHT BOOKING'],
-    ctaTemplates: [
-      {
-        main: 'رحلتكم المميزة تبدأ معنا في {name} ✈️\nامسح الرمز وقيّم تجربة حجزك وإقامتك',
-        secondary: 'نصنع لكم ذكريات سياحية وضيافة استثنائية لا تُنسى'
-      },
-      {
-        main: 'إقامة سعيدة وتجربة ممتعة 🌟\nشاركنا تقييمك على خرائط Google بـ 5 نجوم',
-        secondary: 'أرقى مستويات الضيافة والراحة لخدمتكم على مدار الساعة'
-      }
-    ]
-  },
-  {
-    id: 'photography-media',
-    name: 'استوديوهات تصوير وتوثيق مناسبات وإنتاج إعلامي',
-    keywords: ['استوديو', 'تصوير', 'مصور', 'فوتوغراف', 'مناسبات', 'فيديو', 'مونتاج', 'زواجات', 'photo studio', 'photography', 'production', 'media'],
-    suggestedIcon: 'Camera',
-    suggestedTheme: 'luxury-dark',
-    sampleSubtitles: ['GOLDEN LENS PHOTO STUDIO', 'CINEMATIC EVENTS & PHOTOGRAPHY', 'CREATIVE MEDIA PRODUCTION'],
-    ctaTemplates: [
-      {
-        main: 'نوثّق أجمل لحظاتكم باحتراف في {name} 📸\nامسح الرمز وقيّم تجربتك معنا بـ 5 نجوم ★',
-        secondary: 'جلسات تصوير سينمائية ولقطات توثق ذكرياتكم بأرقى جودة'
-      },
-      {
-        main: 'سعادتكم بذكرياتكم هي نجاحنا ✨\nشاركنا رأيك وتقييمك على خرائط Google',
-        secondary: 'إبداع فني وتقنيات إضاءة متطورة لكل مناسباتكم'
-      }
-    ]
-  },
+
+  // 19. مغاسل ملابس ودراي كلين
   {
     id: 'laundry-dryclean',
     name: 'مغاسل ملابس ودراي كلين وعناية بالأقمشة',
@@ -355,35 +499,49 @@ export const BUSINESS_CATEGORIES: BusinessCategoryInfo[] = [
     suggestedIcon: 'Shirt',
     suggestedTheme: 'modern-white',
     sampleSubtitles: ['WHITE GLOW DRY CLEANING & STEAM', 'PREMIUM LAUNDRY & FABRIC CARE', 'EXPRESS DRY CLEANING'],
+    slogans: [
+      'نظافة ناصعة وتعقيم فائق يعيد لملابسك رونقها',
+      'عناية خاصة بأدق الأقمشة بأحدث تقنيات البخار',
+      'التزام بالمواعيد وجودة تحافظ على أناقتك دائماً'
+    ],
     ctaTemplates: [
       {
-        main: 'نظافة فائقة وعناية تدوم بأناقتك في {name} ✨\nامسح الرمز وقيّم جودة الغسيل والكوي',
-        secondary: 'غسيل وكوي بالبخار بأحدث الأجهزة لحماية أنسجة ملابسك'
+        main: 'نظافة فائقة وعناية تدوم بأناقتك ✨\nامسح الرمز وقيّم جودة الغسيل والكوي',
+        secondary: 'نظافة ناصعة وتعقيم فائق يعيد لملابسك رونقها'
       },
       {
-        main: 'ملابسك في أيدٍ أمينة وخبيرة 👔\nشاركنا تقييمك بـ 5 نجوم على خرائط Google',
-        secondary: 'نلتزم بالسرعة والدقة والتعقيم الشامل لجميع الأقمشة'
+        main: 'ملابسك في أيدٍ أمينة وخبيرة 👔\nشاركنا تقييمك بـ 5 نجوم على Google',
+        secondary: 'عناية خاصة بأدق الأقمشة بأحدث تقنيات البخار'
       }
     ]
   },
+
+  // 20. صيانة هواتف وحاسبات وأجهزة إلكترونية
   {
     id: 'tech-repair-gadgets',
-    name: 'صيانة هواتف وحاسبات وأجهزة إلكترونية',
+    name: 'صيانة جوالات وحاسبات وإلكترونيات',
     keywords: ['صيانة جوالات', 'صيانة لابتوب', 'حاسبات', 'كمبيوتر', 'إلكترونيات', 'ايفون', 'أجهزة ذكية', 'tech repair', 'computer', 'smartphone', 'electronics'],
     suggestedIcon: 'Laptop',
     suggestedTheme: 'luxury-dark',
     sampleSubtitles: ['TECH MASTER COMPUTER & SMARTPHONE', 'SMARTPHONE REPAIR & GADGETS', 'ADVANCED ELECTRONICS SERVICE'],
+    slogans: [
+      'سرعة ودقة في الصيانة وقطع أصلية بضمان معتمد',
+      'أجهزتك في أمان وبأيدي أمهر الفنيين المتخصصين',
+      'حلول تقنية فورية تحافظ على خصوصيتك وبياناتك'
+    ],
     ctaTemplates: [
       {
-        main: 'سرعة ودقة في الصيانة والقطع الأصلية 💻\nامسح الرمز وقيّم خدمتنا في {name}',
-        secondary: 'ضمان معتمد وصيانة فورية لجميع أجهزتك الذكية بأيدي خبراء'
+        main: 'سرعة ودقة في الصيانة والقطع الأصلية 💻\nامسح الرمز وقيّم خدمتنا بـ 5 نجوم ★',
+        secondary: 'سرعة ودقة في الصيانة وقطع أصلية بضمان معتمد'
       },
       {
-        main: 'جهازك عاد كالجديد تماماً! 📱\nشاركنا رأيك وتقييمك بـ 5 نجوم على Google Maps',
-        secondary: 'نحرص على بياناتك ونستخدم أجود قطع الغيار المعتمدة'
+        main: 'جهازك عاد كالجديد تماماً! 📱\nشاركنا رأيك وتقييمك على Google Maps',
+        secondary: 'أجهزتك في أمان وبأيدي أمهر الفنيين المتخصصين'
       }
     ]
   },
+
+  // 21. عام
   {
     id: 'general-business',
     name: 'خدمات وأنشطة تجارية عامة',
@@ -391,9 +549,15 @@ export const BUSINESS_CATEGORIES: BusinessCategoryInfo[] = [
     suggestedIcon: 'Sparkles',
     suggestedTheme: 'classic-paper',
     sampleSubtitles: ['PREMIUM SERVICES & PRODUCTS', 'EXCELLENCE & INTEGRITY', 'YOUR TRUSTED BUSINESS PARTNER'],
+    slogans: [
+      'نسعد دائماً بخدمتكم وتوفير تجربة استثنائية ترقى لتطلعاتكم',
+      'ثقتكم بنا هي رأس مالنا ونسعى للتطور المستمر معكم',
+      'جودة تستحقونها وخدمة تليق بحضرتكم دائماً',
+      'شكراً لثقتكم واختياركم لنا شريكاً لنجاحكم'
+    ],
     ctaTemplates: [
       {
-        main: 'رأيكم يهمنا ويصنع فارقنا في {name} 🌟\nامسح الرمز وشاركنا تقييمك بـ 5 نجوم ★',
+        main: 'رأيكم يهمنا ويصنع فارقنا 🌟\nامسح الرمز وشاركنا تقييمك بـ 5 نجوم ★',
         secondary: 'نسعد دائماً بخدمتكم وتوفير تجربة استثنائية ترقى لتطلعاتكم'
       },
       {
@@ -402,7 +566,7 @@ export const BUSINESS_CATEGORIES: BusinessCategoryInfo[] = [
       },
       {
         main: 'كن شريكاً في قصة نجاحنا 🤝\nامسح الكود واترك انطباعك الكريم',
-        secondary: 'فريق عمل متكامل مكرس لراحتكم وتلبية جميع متطلباتكم'
+        secondary: 'جودة تستحقونها وخدمة تليق بحضرتكم دائماً'
       }
     ]
   }
@@ -444,9 +608,7 @@ export function extractCleanBusinessName(rawName: string): string {
 }
 
 /**
- * Predicts the business category and generates intelligent, personalized texts based on:
- * 1. Business Name (اسم المنشأة)
- * 2. Activity / Category / Nature of Service (طبيعة الخدمة أو التصنيف)
+ * Predicts the business category and generates intelligent, balanced and personalized texts
  */
 export function generateSmartContextualTexts(
   businessName: string,
@@ -473,27 +635,47 @@ export function generateSmartContextualTexts(
     }
   }
 
-  // Generate personalized main texts with the business name embedded
-  const suggestedMainTexts = bestMatch.ctaTemplates.map((template) =>
-    template.main.replace(/\{name\}/g, cleanName)
-  );
+  // 1. Balanced, Creative & Diverse Main CTAs (Short, Punchy, Warm, Direct, Inspiring)
+  const suggestedMainTexts: string[] = [];
 
-  // Add universal high-converting variations with the company name
-  suggestedMainTexts.push(
-    `كيف كانت تجربتك في ${cleanName} اليوم؟\nامسح الرمز وقيّمنا على خرائط Google ★`,
-    `شاركنا رأيك وانطباعك في ${cleanName}\nرأيكم يسعدنا ويصنع الفرق دائماً ✨`,
-    `ساعدنا بتقييم خدمات ${cleanName} بـ 5 نجوم ★\nامسح الرمز بخطوة واحدة سريعة`
-  );
+  // Option 1: Category Specific Core
+  if (bestMatch.ctaTemplates[0]) {
+    suggestedMainTexts.push(bestMatch.ctaTemplates[0].main.replace(/\{name\}/g, cleanName));
+  }
 
-  // Generate personalized secondary texts
-  const suggestedSecondaryTexts = bestMatch.ctaTemplates.map((template) => template.secondary);
-  suggestedSecondaryTexts.push(
-    `نسعى دائماً لتقديم أقصى درجات الجودة لعملاء ${cleanName} الكرام`,
-    `رأيكم الكريم يلهم فريقنا لتقديم أفضل خدمة في كل زيارة`,
-    `شكراً لثقتكم واختياركم لنا دائماً`
-  );
+  // Option 2: Short & Catchy
+  suggestedMainTexts.push(`رأيك يهمنا ويصنع يومنا 🌟\nقيّمنا بـ 5 نجوم على خرائط Google`);
 
-  // English subtitles
+  // Option 3: Category Specific Warm
+  if (bestMatch.ctaTemplates[1]) {
+    suggestedMainTexts.push(bestMatch.ctaTemplates[1].main.replace(/\{name\}/g, cleanName));
+  } else {
+    suggestedMainTexts.push(`نسعد بابتسامتك وخدمتك ✨\nامسح الرمز وشاركنا تقييمك بـ 5 نجوم ★`);
+  }
+
+  // Option 4: Direct Action & Minimal
+  suggestedMainTexts.push(`شاركنا رأيك بـ 5 نجوم ★\nبخطوة واحدة عبر كاميرا هاتفك`);
+
+  // Option 5: Community & Partnership
+  suggestedMainTexts.push(`كن شريكاً في نجاحنا 🤝\nتقييمك يدعمنا لتقديم الأفضل دائماً`);
+
+  // Option 6: Friendly question
+  suggestedMainTexts.push(`كيف كانت تجربتك في ${cleanName}؟ 💫\nامسح الكود وقيّمنا على الخريطة`);
+
+  // 2. Domain-tailored Slogans & Taglines for the Secondary Text
+  const suggestedSecondaryTexts: string[] = [];
+  if (bestMatch.slogans && bestMatch.slogans.length > 0) {
+    suggestedSecondaryTexts.push(...bestMatch.slogans);
+  }
+  // Add common reassuring slogans if list is short
+  if (suggestedSecondaryTexts.length < 4) {
+    suggestedSecondaryTexts.push(
+      `نسعى دائماً لتقديم أقصى درجات الجودة والتميز لعملائنا الكرام`,
+      `شكراً لثقتكم واختياركم لنا دائماً`
+    );
+  }
+
+  // 3. English Subtitles
   const cleanEnglishPrefix = cleanName.toUpperCase().replace(/[^\w\s]/g, '').trim() || 'PREMIUM';
   const suggestedSubtitles = bestMatch.sampleSubtitles.map((sub) => `${cleanEnglishPrefix} ${sub}`);
 
@@ -501,8 +683,8 @@ export function generateSmartContextualTexts(
     detectedCategory: bestMatch,
     confidenceScore: maxScore,
     extractedCleanName: cleanName,
-    suggestedMainTexts,
-    suggestedSecondaryTexts,
+    suggestedMainTexts: Array.from(new Set(suggestedMainTexts)).slice(0, 6),
+    suggestedSecondaryTexts: Array.from(new Set(suggestedSecondaryTexts)).slice(0, 6),
     suggestedSubtitles,
     suggestedIcon: bestMatch.suggestedIcon,
     suggestedTheme: bestMatch.suggestedTheme

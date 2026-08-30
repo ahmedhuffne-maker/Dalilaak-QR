@@ -306,34 +306,32 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
       </div>
 
-      {/* Dedicated Formats Bar: Mobile Scrollable & Touch-Friendly */}
-      <div className="px-3 sm:px-4 py-2 bg-slate-950/60 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto scrollbar-none">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 shrink-0">
+      {/* Dedicated Formats Bar: Responsive Wrapped Layout */}
+      <div className="px-3 sm:px-4 py-2.5 bg-slate-950/70 border-b border-slate-800/80 flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 shrink-0 ml-1">
           <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
-          <span className="hidden sm:inline">المقاس:</span>
+          <span>المقاس:</span>
         </div>
 
-        <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
-          {formats.map((fmt) => {
-            const isSelected = config.format === fmt.id;
-            return (
-              <button
-                key={fmt.id}
-                type="button"
-                onClick={() => onChangeFormat(fmt.id)}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 border min-h-[32px] ${
-                  isSelected
-                    ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-sm ring-1 ring-amber-500/40 font-black'
-                    : 'bg-slate-850 hover:bg-slate-800 text-slate-300 border-slate-750 hover:border-slate-650'
-                }`}
-                title={fmt.desc}
-              >
-                {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />}
-                <span>{fmt.label}</span>
-              </button>
-            );
-          })}
-        </div>
+        {formats.map((fmt) => {
+          const isSelected = config.format === fmt.id;
+          return (
+            <button
+              key={fmt.id}
+              type="button"
+              onClick={() => onChangeFormat(fmt.id)}
+              className={`px-2.5 sm:px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 border min-h-[32px] ${
+                isSelected
+                  ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-sm ring-1 ring-amber-500/40 font-black scale-[1.02]'
+                  : 'bg-slate-850 hover:bg-slate-800 text-slate-300 border-slate-750 hover:border-slate-650'
+              }`}
+              title={fmt.desc}
+            >
+              {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />}
+              <span>{fmt.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Canvas / Mockup Display Stage with Drag-and-Drop */}
