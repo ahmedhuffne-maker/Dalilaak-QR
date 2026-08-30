@@ -7,6 +7,9 @@ export interface PosterConfig {
   businessName: string;
   businessSubtitle: string;
   category: string;
+  showActivityNumber?: boolean;
+  activityNumber?: string;
+  activityNumberLabel?: string;
   
   // Call to action
   mainText: string;

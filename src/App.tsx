@@ -20,6 +20,9 @@ const INITIAL_CONFIG: PosterConfig = {
   businessName: 'لَمْعَة لِغَسِيل السَّيَّارَات',
   businessSubtitle: 'LAMAA CAR WASH',
   category: 'خدمات سيارات',
+  showActivityNumber: false,
+  activityNumber: '',
+  activityNumberLabel: 'رقم النشاط',
   
   mainText: 'شاركنا رأيك\nوتقييمك',
   secondaryText: '',

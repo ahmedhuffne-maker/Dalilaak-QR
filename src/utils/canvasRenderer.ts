@@ -2378,6 +2378,29 @@ export async function renderPosterToCanvas(
       rightY += titleFontSize + 8;
     }
 
+    // Optional Activity Number / Business Code Badge
+    if (config.showActivityNumber && config.activityNumber) {
+      const actLabel = config.activityNumberLabel || 'رقم النشاط';
+      const actText = `${actLabel}: ${config.activityNumber}`;
+      ctx.font = `bold 16px '${config.fontFamily}', Arial, sans-serif`;
+      const actMeasured = ctx.measureText(actText);
+      const pillW = actMeasured.width + 36;
+      const pillH = 30;
+      const pillX = rightColCenterX - pillW / 2;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+      ctx.strokeStyle = config.accentColor;
+      ctx.lineWidth = 1.8;
+      drawRoundRect(ctx, pillX, rightY, pillW, pillH, 15, true, true);
+
+      ctx.fillStyle = config.textColor;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(actText, rightColCenterX, rightY + pillH / 2);
+
+      rightY += pillH + 12;
+    }
+
     // Logo / Category & Car Icon (Larger & Crisp)
     if (config.logoType === 'upload' && config.uploadedLogoDataUrl) {
       const logoImg = await loadImage(config.uploadedLogoDataUrl);
@@ -2505,6 +2528,29 @@ export async function renderPosterToCanvas(
       currentY += 24;
     } else {
       currentY += titleFontSize + 8;
+    }
+
+    // Optional Activity Number / Business Code Badge
+    if (config.showActivityNumber && config.activityNumber) {
+      const actLabel = config.activityNumberLabel || 'رقم النشاط';
+      const actText = `${actLabel}: ${config.activityNumber}`;
+      ctx.font = `bold ${isSquare ? 15 : 17}px '${config.fontFamily}', Arial, sans-serif`;
+      const actMeasured = ctx.measureText(actText);
+      const pillW = actMeasured.width + 36;
+      const pillH = 32;
+      const pillX = (baseWidth - pillW) / 2;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+      ctx.strokeStyle = config.accentColor;
+      ctx.lineWidth = 1.8;
+      drawRoundRect(ctx, pillX, currentY, pillW, pillH, 16, true, true);
+
+      ctx.fillStyle = config.textColor;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(actText, baseWidth / 2, currentY + pillH / 2);
+
+      currentY += pillH + 14;
     }
 
     // Logo / Car Icon
