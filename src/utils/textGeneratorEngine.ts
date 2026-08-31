@@ -75,7 +75,35 @@ export const BUSINESS_CATEGORIES: BusinessCategoryInfo[] = [
     ]
   },
 
-  // 3. غسيل وتلميع سيارات وعناية بالمركبات
+  // 3. أسواق وسوبرماركت وبقالة وخضار وفواكه
+  {
+    id: 'supermarket-grocery',
+    name: 'أسواق وسوبرماركت ومواد غذائية وبقالة',
+    keywords: ['اسواق', 'أسواق', 'سوق', 'ماركت', 'سوبر ماركت', 'سوبرماركت', 'هايبر', 'هايبرماركت', 'بقالة', 'بقاله', 'تموينات', 'ميني ماركت', 'خضار', 'فواكه', 'عطارة', 'أغذية', 'مواد غذائية', 'supermarket', 'hypermarket', 'grocery', 'market', 'mart', 'food'],
+    suggestedIcon: 'Store',
+    suggestedTheme: 'royal-navy',
+    sampleSubtitles: ['SUPERMARKET & FRESH GROCERY', 'FOOD MARKET & DAILY ESSENTIALS', 'HYPERMARKET & FOOD CENTER'],
+    slogans: [
+      'أجود المنتجات الطازجة يومياً لخدمة عائلتك',
+      'كل ما يلزم بيتك وعائلتك بأفضل جودة وأنسب سعر',
+      'تسوق ممتع وتنوع لا ينتهي لكل احتياجاتكم',
+      'طازج كل يوم ومنتجات مختارة بعناية فائقة'
+    ],
+    ctaTemplates: [
+      {
+        main: 'تسوقكم معنا يسعدنا ويشرّفنا دائماً 🛒\nامسح الرمز وقيّمنا بـ 5 نجوم ★',
+        secondary: 'أجود المنتجات الطازجة يومياً لخدمة عائلتك'
+      },
+      {
+        main: 'كيف كانت تجربة تسوقك في {name}؟ ✨\nشاركنا تقييمك على خرائط Google',
+        secondary: 'كل ما يلزم بيتك وعائلتك بأفضل جودة وأنسب سعر'
+      },
+      {
+        main: 'نسعد دائماً بخدمتكم وتوفير طلباتكم 🌟\nقيّمنا بـ 5 نجوم على Google Maps',
+        secondary: 'تسوق ممتع وتنوع لا ينتهي لكل احتياجاتكم'
+      }
+    ]
+  },
   {
     id: 'car-wash',
     name: 'غسيل وتلميع سيارات وعناية بالمركبات',
@@ -675,9 +703,15 @@ export function generateSmartContextualTexts(
     );
   }
 
-  // 3. English Subtitles
-  const cleanEnglishPrefix = cleanName.toUpperCase().replace(/[^\w\s]/g, '').trim() || 'PREMIUM';
-  const suggestedSubtitles = bestMatch.sampleSubtitles.map((sub) => `${cleanEnglishPrefix} ${sub}`);
+  // 3. English Subtitles (Clean & properly styled without repetitive words)
+  const englishOnlyName = cleanName.replace(/[^a-zA-Z0-9\s]/g, '').trim().toUpperCase();
+  const suggestedSubtitles = bestMatch.sampleSubtitles.map((sub) => {
+    const cleanSub = sub.replace(/\b(PREMIUM|QUALITY|LUXURY|VIP)\s+\1\b/gi, '$1').trim();
+    if (englishOnlyName.length > 2 && !cleanSub.startsWith(englishOnlyName)) {
+      return `${englishOnlyName} • ${cleanSub}`;
+    }
+    return cleanSub;
+  });
 
   return {
     detectedCategory: bestMatch,
@@ -685,7 +719,7 @@ export function generateSmartContextualTexts(
     extractedCleanName: cleanName,
     suggestedMainTexts: Array.from(new Set(suggestedMainTexts)).slice(0, 6),
     suggestedSecondaryTexts: Array.from(new Set(suggestedSecondaryTexts)).slice(0, 6),
-    suggestedSubtitles,
+    suggestedSubtitles: Array.from(new Set(suggestedSubtitles)),
     suggestedIcon: bestMatch.suggestedIcon,
     suggestedTheme: bestMatch.suggestedTheme
   };

@@ -117,14 +117,17 @@ export function mapBusinessToPosterConfig(
     business.landmark
   ].filter(Boolean);
   
-  const businessSubtitle = business.name_en 
-    ? `${business.name_en.toUpperCase()} • ${business.city || business.governorate || ''}`.trim()
-    : (smartTexts.suggestedSubtitles[0] || addressParts.slice(0, 2).join(' • '));
+  // English Business Subtitle (Clean without duplicate words)
+  let businessSubtitle = '';
+  if (business.name_en && business.name_en.trim().length > 2) {
+    businessSubtitle = business.name_en.toUpperCase().trim();
+  } else {
+    businessSubtitle = smartTexts.suggestedSubtitles[0] || 'QUALITY & EXCELLENCE';
+  }
+  businessSubtitle = businessSubtitle.replace(/\b(PREMIUM|QUALITY|LUXURY|VIP)\s+\1\b/gi, '$1').trim();
 
   // Registered Phone numbers
   const registeredPhone = business.phone || business.secondary_phone || '';
-  const mainPhone = business.phone || business.secondary_phone || prevConfig.footerPhone;
-  const whatsappPhone = business.secondary_phone || business.phone || prevConfig.footerWhatsApp;
 
   // Google Maps or Rating URL
   let qrTargetUrl = prevConfig.qrUrl;
@@ -152,8 +155,8 @@ export function mapBusinessToPosterConfig(
   return {
     ...prevConfig,
     businessName: businessName,
-    businessSubtitle: businessSubtitle || 'PREMIUM SERVICE & QUALITY',
-    category: category,
+    businessSubtitle: businessSubtitle,
+    category: business.category && business.category !== 'عام' ? business.category : smartTexts.detectedCategory.name,
     showActivityNumber: Boolean(registeredPhone),
     activityNumber: registeredPhone,
     activityNumberLabel: 'رقم التواصل',
