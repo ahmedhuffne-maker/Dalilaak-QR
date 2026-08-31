@@ -2331,11 +2331,14 @@ export async function renderPosterToCanvas(
 
   if (isLandscape) {
     // -------------------------------------------------------------
-    // DYNAMIC TWO-COLUMN FLOW (Landscape Layout)
+    // DYNAMIC TWO-COLUMN FLOW (Landscape Layout - A3/A4 Landscape)
     // -------------------------------------------------------------
-    const leftColCenterX = baseWidth * 0.28;
-    const rightColCenterX = baseWidth * 0.67;
-    const rightColMaxW = baseWidth * 0.58;
+    const leftColWidth = baseWidth * 0.38;
+    const leftColCenterX = leftColWidth / 2 + 25;
+    const rightColStartX = leftColWidth + 35;
+    const rightColWidth = baseWidth - rightColStartX - 35;
+    const rightColCenterX = rightColStartX + rightColWidth / 2;
+    const rightColMaxW = rightColWidth - 20;
 
     const availableRightHeight = footerY - 50;
     const lines = (config.mainText || '').split('\n').filter(l => l.trim().length > 0);
@@ -2350,39 +2353,39 @@ export async function renderPosterToCanvas(
 
     // Measure raw estimated height for right column
     const rawRightH =
-      (hasBadge ? 48 : 0) +
-      56 +
-      (hasSubtitle ? 32 : 0) +
-      (hasActivityNumber ? 52 : 0) +
-      (hasLogo ? (isCar ? 100 : 75) : 0) +
-      (lineCount * 46) +
-      60 + // stars
-      (hasSecondaryText ? 36 : 0);
+      (hasBadge ? 42 : 0) +
+      46 +
+      (hasSubtitle ? 26 : 0) +
+      (hasActivityNumber ? 44 : 0) +
+      (hasLogo ? (isCar ? 75 : 55) : 0) +
+      (lineCount * 38) +
+      48 + // stars
+      (hasSecondaryText ? 28 : 0);
 
-    const landscapeScale = Math.min(1.0, Math.max(0.68, availableRightHeight / Math.max(1, rawRightH)));
+    const landscapeScale = Math.min(1.0, Math.max(0.65, availableRightHeight / Math.max(1, rawRightH)));
 
-    const badgeH = Math.round(36 * landscapeScale);
-    const badgeW = Math.round(250 * landscapeScale);
-    const badgeSpacing = Math.round(14 * landscapeScale);
+    const badgeH = Math.round(32 * landscapeScale);
+    const badgeW = Math.round(230 * landscapeScale);
+    const badgeSpacing = Math.round(10 * landscapeScale);
     
-    const titleFontSize = Math.max(30, Math.round(54 * landscapeScale));
-    const subtitleFontSize = Math.max(14, Math.round(20 * landscapeScale));
+    const titleFontSize = Math.max(26, Math.round(42 * landscapeScale));
+    const subtitleFontSize = Math.max(13, Math.round(16 * landscapeScale));
     
-    const actPillH = Math.max(34, Math.round(44 * landscapeScale));
-    const numFontSize = Math.max(17, Math.round(23 * landscapeScale));
+    const actPillH = Math.max(30, Math.round(38 * landscapeScale));
+    const numFontSize = Math.max(16, Math.round(20 * landscapeScale));
     
-    const iconBaseSize = isCar ? 110 : 75;
-    const iconSize = Math.max(36, Math.round(iconBaseSize * (config.logoScale || 1) * landscapeScale));
+    const iconBaseSize = isCar ? 85 : 60;
+    const iconSize = Math.max(32, Math.round(iconBaseSize * (config.logoScale || 1) * landscapeScale));
     
-    const mainFontSize = Math.max(22, Math.round(38 * landscapeScale));
-    const starSize = Math.max(18, Math.round(28 * landscapeScale));
-    const secFontSize = Math.max(14, Math.round(20 * landscapeScale));
-    const rGap = Math.max(6, Math.round(12 * landscapeScale));
+    const mainFontSize = Math.max(19, Math.round(28 * landscapeScale));
+    const starSize = Math.max(16, Math.round(22 * landscapeScale));
+    const secFontSize = Math.max(13, Math.round(16 * landscapeScale));
+    const rGap = Math.max(5, Math.round(10 * landscapeScale));
 
-    // QR in left column
-    const qrMaxTarget = Math.min(baseWidth * 0.42, footerY - (config.showNfcBadge ? 110 : 60));
-    const qrTargetSize = Math.max(200, Math.round(qrMaxTarget * (config.qrScale || 1.0)));
-    const qrCenterY = (footerY - (config.showNfcBadge ? 30 : 0)) / 2;
+    // QR in left column: Perfectly proportioned (never oversized)
+    const qrMaxTarget = Math.min(340, leftColWidth - 60, footerY - (config.showNfcBadge ? 100 : 50));
+    const qrTargetSize = Math.max(180, Math.round(qrMaxTarget * (config.qrScale || 1.0)));
+    const qrCenterY = (footerY - (config.showNfcBadge ? 25 : 0)) / 2;
 
     // Center the right column content vertically relative to QR
     const totalActualRightH =
@@ -2395,25 +2398,35 @@ export async function renderPosterToCanvas(
       (starSize * 2 + rGap) +
       (hasSecondaryText ? secFontSize + rGap : 0);
 
-    let rightY = Math.max(30, Math.round((footerY - totalActualRightH) / 2));
+    let rightY = Math.max(25, Math.round((footerY - totalActualRightH) / 2));
 
     // Google Badge (Top Right)
     if (hasBadge) {
       const badgeX = rightColCenterX - badgeW / 2;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
       drawRoundRect(ctx, badgeX, rightY, badgeW, badgeH, badgeH / 2, true, false);
+
+      ctx.font = `bold ${Math.round(11.5 * landscapeScale)}px '${config.fontFamily}', sans-serif`;
+      const bTextStr = 'تقييمات خرائط Google المعتمدة';
+      const bTextW = ctx.measureText(bTextStr).width;
+      const gW = 16 * landscapeScale;
+      const bContentW = gW + 6 + bTextW;
+      const bStartX = rightColCenterX - bContentW / 2;
+
       ctx.fillStyle = '#4285F4';
-      ctx.font = `bold ${Math.round(16 * landscapeScale)}px Arial`;
-      ctx.textAlign = 'center';
+      ctx.font = `bold ${Math.round(14 * landscapeScale)}px Arial`;
+      ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText('G', badgeX + Math.round(22 * landscapeScale), rightY + badgeH / 2);
+      ctx.fillText('G', bStartX, rightY + badgeH / 2);
+
       ctx.fillStyle = '#1e293b';
-      ctx.font = `bold ${Math.round(13 * landscapeScale)}px '${config.fontFamily}', sans-serif`;
-      ctx.fillText('تقييمات خرائط Google المعتمدة', badgeX + badgeW / 2 + 8, rightY + badgeH / 2);
+      ctx.font = `bold ${Math.round(11.5 * landscapeScale)}px '${config.fontFamily}', sans-serif`;
+      ctx.fillText(bTextStr, bStartX + gW + 6, rightY + badgeH / 2);
+
       rightY += badgeH + badgeSpacing;
     }
 
-    // Business Name (Arabic - Bold & Large)
+    // Business Name (Arabic)
     ctx.fillStyle = config.textColor;
     ctx.font = `900 ${titleFontSize}px '${config.fontFamily}', sans-serif`;
     ctx.textAlign = 'center';
@@ -2422,7 +2435,7 @@ export async function renderPosterToCanvas(
     const measured = ctx.measureText(titleText);
     let finalTitleSize = titleFontSize;
     if (measured.width > rightColMaxW) {
-      finalTitleSize = Math.max(26, Math.floor(titleFontSize * (rightColMaxW / measured.width)));
+      finalTitleSize = Math.max(22, Math.floor(titleFontSize * (rightColMaxW / measured.width)));
       ctx.font = `900 ${finalTitleSize}px '${config.fontFamily}', sans-serif`;
     }
     ctx.fillText(titleText, rightColCenterX, rightY);
@@ -2432,29 +2445,24 @@ export async function renderPosterToCanvas(
     if (hasSubtitle && config.businessSubtitle) {
       ctx.font = `800 ${subtitleFontSize}px 'Outfit', 'Tajawal', sans-serif`;
       ctx.fillStyle = config.accentColor;
-      ctx.letterSpacing = '1.8px';
+      ctx.letterSpacing = '1.5px';
       ctx.fillText(config.businessSubtitle.toUpperCase(), rightColCenterX, rightY);
       ctx.letterSpacing = '0px';
       rightY += subtitleFontSize + rGap;
     }
 
-    // Official Business/Activity Code Badge
+    // Official Business/Activity Code Badge (WhatsApp only icon)
     if (hasActivityNumber && config.activityNumber) {
       const cleanNum = config.activityNumber.trim();
-      ctx.font = `900 ${numFontSize}px 'Outfit', 'Cairo', 'Tajawal', sans-serif`;
-      ctx.letterSpacing = '2px';
+      ctx.font = `900 ${numFontSize}px 'Outfit', 'Tajawal', sans-serif`;
+      ctx.letterSpacing = '0px';
       const textW = ctx.measureText(cleanNum).width;
 
       const showWa = config.activityShowWhatsAppIcon !== false;
-      const showPh = !!config.activityShowPhoneIcon;
-      const iconCount = (showWa ? 1 : 0) + (showPh ? 1 : 0);
-      const actIconSize = Math.round(26 * landscapeScale);
-      const actIconGap = 6;
-      const iconsBlockW = iconCount > 0 ? (iconCount * actIconSize) + ((iconCount - 1) * actIconGap) : 0;
-      const spacingBetween = iconCount > 0 ? 12 : 0;
-
-      const totalContentW = textW + spacingBetween + iconsBlockW;
-      const pillW = Math.max(190, totalContentW + Math.round(44 * landscapeScale));
+      const actIconSize = Math.round(22 * landscapeScale);
+      const spacingBetween = showWa ? 10 : 0;
+      const totalContentW = textW + spacingBetween + (showWa ? actIconSize : 0);
+      const pillW = Math.max(160, totalContentW + Math.round(36 * landscapeScale));
       const pillX = rightColCenterX - pillW / 2;
       const pillCenterY = rightY + actPillH / 2;
 
@@ -2464,7 +2472,7 @@ export async function renderPosterToCanvas(
 
       ctx.fillStyle = badgeBg;
       ctx.strokeStyle = config.accentColor || '#e5a82e';
-      ctx.lineWidth = 2.2;
+      ctx.lineWidth = 2.0;
       drawRoundRect(ctx, pillX, rightY, pillW, actPillH, actPillH / 2, true, true);
 
       let curX = rightColCenterX - totalContentW / 2;
@@ -2472,16 +2480,10 @@ export async function renderPosterToCanvas(
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.fillText(cleanNum, curX, pillCenterY + 1);
-      ctx.letterSpacing = '0px';
 
-      curX += textW + spacingBetween;
       if (showWa) {
+        curX += textW + spacingBetween;
         await drawWhatsAppIcon(ctx, curX + actIconSize / 2, pillCenterY, actIconSize);
-        curX += actIconSize + actIconGap;
-      }
-      if (showPh) {
-        await drawPhoneIcon(ctx, curX + actIconSize / 2, pillCenterY, actIconSize);
-        curX += actIconSize + actIconGap;
       }
 
       rightY += actPillH + rGap;
@@ -2491,8 +2493,8 @@ export async function renderPosterToCanvas(
     if (config.logoType === 'upload' && config.uploadedLogoDataUrl) {
       const logoImg = await loadImage(config.uploadedLogoDataUrl);
       if (logoImg) {
-        const maxLogoW = 260 * (config.logoScale || 1) * landscapeScale;
-        const maxLogoH = 95 * (config.logoScale || 1) * landscapeScale;
+        const maxLogoW = 220 * (config.logoScale || 1) * landscapeScale;
+        const maxLogoH = 75 * (config.logoScale || 1) * landscapeScale;
         let lw = logoImg.width;
         let lh = logoImg.height;
         const ratio = Math.min(maxLogoW / lw, maxLogoH / lh);
@@ -2527,7 +2529,7 @@ export async function renderPosterToCanvas(
 
     // Stars Rating
     rightY += Math.round(rGap * 0.6);
-    const starGap = Math.max(8, Math.round(12 * landscapeScale));
+    const starGap = Math.max(6, Math.round(10 * landscapeScale));
     const totalStarsWidth = (starSize * 2 * config.starCount) + (starGap * (config.starCount - 1));
     const startStarX = rightColCenterX - totalStarsWidth / 2 + starSize;
     for (let s = 0; s < config.starCount; s++) {
@@ -2536,7 +2538,7 @@ export async function renderPosterToCanvas(
     }
     rightY += starSize * 2 + Math.round(rGap * 0.7);
 
-    // Secondary Text (Clear & Elegant)
+    // Secondary Text
     if (hasSecondaryText && config.secondaryText) {
       ctx.font = `600 ${secFontSize}px '${config.fontFamily}', sans-serif`;
       ctx.fillStyle = config.textColor;
@@ -2550,14 +2552,14 @@ export async function renderPosterToCanvas(
 
     // NFC badge under QR in landscape
     if (config.showNfcBadge) {
-      const nfcPillW = Math.min(280, qrTargetSize);
-      const nfcPillH = 32;
+      const nfcPillW = Math.min(260, qrTargetSize);
+      const nfcPillH = 30;
       const nfcPillX = leftColCenterX - nfcPillW / 2;
       const nfcPillY = qrCenterY + qrTargetSize / 2 + 10;
       ctx.fillStyle = config.accentColor;
-      drawRoundRect(ctx, nfcPillX, nfcPillY, nfcPillW, nfcPillH, 16, true, false);
+      drawRoundRect(ctx, nfcPillX, nfcPillY, nfcPillW, nfcPillH, 15, true, false);
       ctx.fillStyle = '#0f172a';
-      ctx.font = `bold 12.5px '${config.fontFamily}', sans-serif`;
+      ctx.font = `bold 12px '${config.fontFamily}', sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(config.nfcText || 'امسح بالكاميرا أو مرر بطاقة NFC', leftColCenterX, nfcPillY + nfcPillH / 2);
@@ -2582,62 +2584,72 @@ export async function renderPosterToCanvas(
 
     // Estimate base required height
     const baseEstimatedTextHeight =
-      (hasBadge ? 48 : 0) +
-      60 + // Title
-      (hasSubtitle ? 32 : 0) +
-      (hasActivityNumber ? 54 : 0) +
-      (hasLogoOrIcon ? 85 : 0) +
-      (lineCount * 48) + // Main text
-      55 + // Stars
-      (hasSecondaryText ? 36 : 0);
+      (hasBadge ? 44 : 0) +
+      56 + // Title
+      (hasSubtitle ? 28 : 0) +
+      (hasActivityNumber ? 48 : 0) +
+      (hasLogoOrIcon ? 80 : 0) +
+      (lineCount * 44) + // Main text
+      50 + // Stars
+      (hasSecondaryText ? 32 : 0);
 
     // Dynamic Scale Factor based on available vertical space & format
-    const targetTextBudget = isSquare ? availableVerticalHeight * 0.50 : availableVerticalHeight * 0.58;
+    const targetTextBudget = isSquare ? availableVerticalHeight * 0.48 : availableVerticalHeight * 0.55;
     const scaleFactor = Math.min(1.0, Math.max(0.68, targetTextBudget / Math.max(1, baseEstimatedTextHeight)));
 
     // Scaled dynamic sizes
     const badgeW = Math.round(230 * scaleFactor);
     const badgeH = Math.round(34 * scaleFactor);
     
-    const titleBaseSize = isSquare ? 42 : (baseHeight > 1150 ? 52 : 46);
-    const titleFontSize = Math.max(28, Math.round(titleBaseSize * scaleFactor));
+    const titleBaseSize = isSquare ? 40 : (baseHeight > 1150 ? 50 : 44);
+    const titleFontSize = Math.max(26, Math.round(titleBaseSize * scaleFactor));
     
-    const subtitleFontSize = Math.max(13, Math.round(18 * scaleFactor));
-    const pillH = Math.max(34, Math.round(44 * scaleFactor));
-    const numFontSize = Math.max(18, Math.round(24 * scaleFactor));
+    const subtitleFontSize = Math.max(13, Math.round(17 * scaleFactor));
+    const pillH = Math.max(34, Math.round(42 * scaleFactor));
+    const numFontSize = Math.max(17, Math.round(23 * scaleFactor));
     
-    const iconBaseSize = isSquare ? 60 : 75;
-    const iconSize = Math.max(38, Math.round(iconBaseSize * (config.logoScale || 1.0) * scaleFactor));
+    const iconBaseSize = isSquare ? 58 : 72;
+    const iconSize = Math.max(36, Math.round(iconBaseSize * (config.logoScale || 1.0) * scaleFactor));
     
-    const mainBaseSize = isSquare ? 30 : 38;
-    const mainFontSize = Math.max(22, Math.round(mainBaseSize * scaleFactor));
+    const mainBaseSize = isSquare ? 28 : 36;
+    const mainFontSize = Math.max(20, Math.round(mainBaseSize * scaleFactor));
     
-    const starSize = Math.max(18, Math.round(26 * scaleFactor));
+    const starSize = Math.max(17, Math.round(25 * scaleFactor));
     const starGap = Math.max(8, Math.round(12 * scaleFactor));
     
-    const secondaryFontSize = Math.max(14, Math.round(18 * scaleFactor));
+    const secondaryFontSize = Math.max(13, Math.round(17 * scaleFactor));
     
-    const gap = Math.max(6, Math.round(14 * scaleFactor));
+    const gap = Math.max(6, Math.round(13 * scaleFactor));
 
-    let currentY = isSquare ? Math.round(35 * scaleFactor) : Math.round(50 * scaleFactor);
+    let currentY = isSquare ? Math.round(32 * scaleFactor) : Math.round(46 * scaleFactor);
 
-    // 1. Google Badge
+    // 1. Google Badge (Exact mathematical symmetry on center)
     if (hasBadge) {
       const badgeX = (baseWidth - badgeW) / 2;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
       drawRoundRect(ctx, badgeX, currentY, badgeW, badgeH, badgeH / 2, true, false);
+
+      ctx.font = `bold ${Math.round(12 * scaleFactor)}px '${config.fontFamily}', sans-serif`;
+      const badgeTextStr = 'تقييمات خرائط Google المعتمدة';
+      const badgeTextW = ctx.measureText(badgeTextStr).width;
+      const gIconW = 18 * scaleFactor;
+      const badgeContentW = gIconW + 7 + badgeTextW;
+      const badgeStartX = (baseWidth - badgeContentW) / 2;
+
       ctx.fillStyle = '#4285F4';
       ctx.font = `bold ${Math.round(15 * scaleFactor)}px Arial`;
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText('G', badgeX + Math.round(20 * scaleFactor), currentY + badgeH / 2);
+      ctx.fillText('G', badgeStartX, currentY + badgeH / 2);
+
       ctx.fillStyle = '#1e293b';
-      ctx.font = `bold ${Math.round(12.5 * scaleFactor)}px '${config.fontFamily}', sans-serif`;
-      ctx.fillText('تقييمات خرائط Google المعتمدة', badgeX + badgeW / 2 + 8, currentY + badgeH / 2);
+      ctx.font = `bold ${Math.round(12 * scaleFactor)}px '${config.fontFamily}', sans-serif`;
+      ctx.fillText(badgeTextStr, badgeStartX + gIconW + 7, currentY + badgeH / 2);
+
       currentY += badgeH + gap;
     }
 
-    // 2. Business Title
+    // 2. Business Title (Perfect Center)
     ctx.fillStyle = config.textColor;
     ctx.font = `900 ${titleFontSize}px '${config.fontFamily}', sans-serif`;
     ctx.textAlign = 'center';
@@ -2647,13 +2659,13 @@ export async function renderPosterToCanvas(
     const measuredTitle = ctx.measureText(titleText);
     let finalTitleFontSize = titleFontSize;
     if (measuredTitle.width > maxTitleWidth) {
-      finalTitleFontSize = Math.max(24, Math.floor(titleFontSize * (maxTitleWidth / measuredTitle.width)));
+      finalTitleFontSize = Math.max(22, Math.floor(titleFontSize * (maxTitleWidth / measuredTitle.width)));
       ctx.font = `900 ${finalTitleFontSize}px '${config.fontFamily}', sans-serif`;
     }
     ctx.fillText(titleText, baseWidth / 2, currentY);
     currentY += finalTitleFontSize * 0.95 + Math.round(gap * 0.7);
 
-    // 3. Business Subtitle
+    // 3. Business Subtitle (Perfect Center)
     if (hasSubtitle && config.businessSubtitle) {
       ctx.font = `800 ${subtitleFontSize}px 'Outfit', 'Tajawal', sans-serif`;
       ctx.fillStyle = config.accentColor;
@@ -2663,23 +2675,19 @@ export async function renderPosterToCanvas(
       currentY += subtitleFontSize + gap;
     }
 
-    // 4. Activity Number / Phone Pill
+    // 4. Activity Number / Phone Pill (Perfect Center, WhatsApp Icon Only)
     if (hasActivityNumber && config.activityNumber) {
       const cleanNum = config.activityNumber.trim();
       ctx.font = `900 ${numFontSize}px 'Outfit', 'Cairo', 'Tajawal', sans-serif`;
-      ctx.letterSpacing = '2px';
+      ctx.letterSpacing = '0px';
       const textW = ctx.measureText(cleanNum).width;
       
       const showWa = config.activityShowWhatsAppIcon !== false;
-      const showPh = !!config.activityShowPhoneIcon;
-      const iconCount = (showWa ? 1 : 0) + (showPh ? 1 : 0);
-      const actIconSize = Math.round(28 * scaleFactor);
-      const actIconGap = 6;
-      const iconsBlockW = iconCount > 0 ? (iconCount * actIconSize) + ((iconCount - 1) * actIconGap) : 0;
-      const spacingBetween = iconCount > 0 ? 12 : 0;
+      const actIconSize = Math.round(25 * scaleFactor);
+      const spacingBetween = showWa ? 10 : 0;
       
-      const totalContentW = textW + spacingBetween + iconsBlockW;
-      const pillW = Math.max(180, totalContentW + Math.round(40 * scaleFactor));
+      const totalContentW = textW + spacingBetween + (showWa ? actIconSize : 0);
+      const pillW = Math.max(170, totalContentW + Math.round(38 * scaleFactor));
       const pillX = (baseWidth - pillW) / 2;
       const pillCenterY = currentY + pillH / 2;
 
@@ -2690,7 +2698,7 @@ export async function renderPosterToCanvas(
 
       ctx.fillStyle = badgeBg;
       ctx.strokeStyle = config.accentColor || '#e5a82e';
-      ctx.lineWidth = 2.2;
+      ctx.lineWidth = 2.0;
       drawRoundRect(ctx, pillX, currentY, pillW, pillH, pillH / 2, true, true);
 
       let curX = (baseWidth - totalContentW) / 2;
@@ -2698,27 +2706,21 @@ export async function renderPosterToCanvas(
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.fillText(cleanNum, curX, pillCenterY + 1);
-      ctx.letterSpacing = '0px';
 
-      curX += textW + spacingBetween;
       if (showWa) {
+        curX += textW + spacingBetween;
         await drawWhatsAppIcon(ctx, curX + actIconSize / 2, pillCenterY, actIconSize);
-        curX += actIconSize + actIconGap;
-      }
-      if (showPh) {
-        await drawPhoneIcon(ctx, curX + actIconSize / 2, pillCenterY, actIconSize);
-        curX += actIconSize + actIconGap;
       }
 
       currentY += pillH + gap;
     }
 
-    // 5. Logo / Icon
+    // 5. Logo / Icon (Perfect Center)
     if (config.logoType === 'upload' && config.uploadedLogoDataUrl) {
       const logoImg = await loadImage(config.uploadedLogoDataUrl);
       if (logoImg) {
-        const maxLogoW = (isSquare ? 200 : 250) * (config.logoScale || 1) * scaleFactor;
-        const maxLogoH = (isSquare ? 75 : 95) * (config.logoScale || 1) * scaleFactor;
+        const maxLogoW = (isSquare ? 190 : 240) * (config.logoScale || 1) * scaleFactor;
+        const maxLogoH = (isSquare ? 70 : 90) * (config.logoScale || 1) * scaleFactor;
         let lw = logoImg.width;
         let lh = logoImg.height;
         const ratio = Math.min(maxLogoW / lw, maxLogoH / lh);
@@ -2740,7 +2742,7 @@ export async function renderPosterToCanvas(
       currentY += iconSize + gap;
     }
 
-    // 6. Main Review CTA Text
+    // 6. Main Review CTA Text (Perfect Center)
     ctx.fillStyle = config.textColor;
     ctx.font = `bold ${mainFontSize}px '${config.fontFamily}', sans-serif`;
     ctx.textAlign = 'center';
@@ -2751,7 +2753,7 @@ export async function renderPosterToCanvas(
       currentY += lineHeight;
     }
 
-    // 7. Stars Rating
+    // 7. Stars Rating (Perfect Center)
     currentY += Math.round(gap * 0.6);
     const totalStarsWidth = (starSize * 2 * config.starCount) + (starGap * (config.starCount - 1));
     const startStarX = (baseWidth - totalStarsWidth) / 2 + starSize;
@@ -2761,7 +2763,7 @@ export async function renderPosterToCanvas(
     }
     currentY += starSize * 2 + Math.round(gap * 0.7);
 
-    // 8. Secondary Slogan Subtext
+    // 8. Secondary Slogan Subtext (Perfect Center)
     if (hasSecondaryText && config.secondaryText) {
       ctx.font = `500 ${secondaryFontSize}px '${config.fontFamily}', sans-serif`;
       ctx.fillStyle = config.textColor;
@@ -2772,10 +2774,10 @@ export async function renderPosterToCanvas(
     }
 
     // 9. QR Code Box & Guarantee of Non-Overlapping Position
-    const nfcReservedHeight = hasNfcBadge ? 46 : 0;
+    const nfcReservedHeight = hasNfcBadge ? 44 : 0;
     const remainingSpaceForQr = footerY - currentY - nfcReservedHeight - 16;
     
-    const qrBaseMax = isSquare ? 280 : (baseHeight > 1150 ? 380 : 320);
+    const qrBaseMax = isSquare ? 260 : (baseHeight > 1150 ? 360 : 310);
     const qrTargetSize = Math.max(140, Math.min(baseWidth - 120, Math.min(qrBaseMax * (config.qrScale || 1.0), remainingSpaceForQr)));
     
     // Center the QR in the actual remaining space below the texts
@@ -2785,14 +2787,14 @@ export async function renderPosterToCanvas(
 
     // 10. NFC Badge strictly below QR
     if (hasNfcBadge) {
-      const nfcPillW = Math.min(280, qrTargetSize);
-      const nfcPillH = 32;
+      const nfcPillW = Math.min(270, qrTargetSize);
+      const nfcPillH = 30;
       const nfcPillX = (baseWidth - nfcPillW) / 2;
       const nfcPillY = qrCenterY + qrTargetSize / 2 + 8;
       ctx.fillStyle = config.accentColor;
-      drawRoundRect(ctx, nfcPillX, nfcPillY, nfcPillW, nfcPillH, 16, true, false);
+      drawRoundRect(ctx, nfcPillX, nfcPillY, nfcPillW, nfcPillH, 15, true, false);
       ctx.fillStyle = '#0f172a';
-      ctx.font = `bold 12.5px '${config.fontFamily}', sans-serif`;
+      ctx.font = `bold 12px '${config.fontFamily}', sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(config.nfcText || 'امسح بالكاميرا أو مرر بطاقة NFC', baseWidth / 2, nfcPillY + nfcPillH / 2);
