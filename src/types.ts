@@ -111,15 +111,21 @@ export interface DalilakBusiness {
   owner_name?: string;
   owner_phone?: string;
   owner_email?: string;
+  national_id?: string;
   photos?: string[] | { url: string }[] | any;
-  rep_id?: string;
-  rep_name?: string;
+  package_id?: string;
   package_name?: string;
+  package_price?: number;
+  amount_paid?: number;
   payment_status?: string;
   verification_status?: string;
-  google_maps_url?: string;
-  google_place_id?: string;
+  rep_id?: string;
+  rep_name?: string;
   invoice_number?: string;
   invoice_date?: string;
+  google_maps_url?: string;
+  google_place_id?: string;
+  notes?: string | Record<string, any>;
   created_at?: string;
 }
+

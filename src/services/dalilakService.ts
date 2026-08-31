@@ -25,6 +25,125 @@ export function resetDalilakConfig() {
   localStorage.removeItem(STORAGE_KEY_KEY);
 }
 
+export interface DalilakGoogleMapsInfo {
+  verifiedUrl: string | null;
+  isVerified: boolean;
+  repCoordinatesUrl: string | null;
+  googlePlaceId: string | null;
+  googleSyncStatus: 'synced' | 'in_progress' | 'not_synced' | string;
+  verificationStatus: string;
+  notesObj: Record<string, any>;
+}
+
+/**
+ * Checks if a given Google Maps link is a verified place link (added by admins/Google)
+ * rather than a raw unverified coordinates link sent by representatives during initial survey.
+ */
+export function isVerifiedGoogleMapsLink(url: string | null | undefined): boolean {
+  if (!url || typeof url !== 'string' || !url.startsWith('http')) return false;
+  const trimmed = url.trim();
+
+  // 1. Check for known verified link formats (short links, review links, CID links, place profile links)
+  if (/maps\.app\.goo\.gl\/[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
+  if (/goo\.gl\/maps\/[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
+  if (/g\.page\/r\/[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
+  if (/search\.google\.com\/local\/(writereview|reviews)\?placeid=/i.test(trimmed)) return true;
+  if (/[?&]cid=\d+/i.test(trimmed)) return true;
+  if (/[?&]query_place_id=/i.test(trimmed)) return true;
+
+  // 2. Identify and reject raw representative coordinates query URLs (e.g. ?api=1&query=29.968951,31.090401 or ?q=29.968951,31.090401)
+  // Representative links drop a generic blank pin at coordinates without an established business profile.
+  const isRawCoordQuery = /[?&]query=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
+  const isRawQCoord = /[?&]q=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
+  const isRawAtCoord = /\/maps\/@-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
+  const isRawPlaceCoord = /\/maps\/place\/-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
+
+  if (isRawCoordQuery || isRawQCoord || isRawAtCoord || isRawPlaceCoord) {
+    return false;
+  }
+
+  // 3. If it contains a named place or custom business path on google maps
+  if (/\/maps\/place\/[^\/?#]+/i.test(trimmed)) {
+    return true;
+  }
+
+  // If it's a general google link with business query rather than bare numbers
+  if (/google\.com\/maps/i.test(trimmed)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Parses and extracts Google Maps verification data from a Dalilak business record.
+ * Handles database fields, notes JSON payload, place IDs, and representative coordinate links.
+ */
+export function extractBusinessGoogleInfo(business: DalilakBusiness): DalilakGoogleMapsInfo {
+  let notesObj: Record<string, any> = {};
+  if (business.notes) {
+    if (typeof business.notes === 'string') {
+      try {
+        notesObj = JSON.parse(business.notes);
+      } catch (e) {
+        notesObj = {};
+      }
+    } else if (typeof business.notes === 'object') {
+      notesObj = business.notes;
+    }
+  }
+
+  const googlePlaceId = business.google_place_id || notesObj.googlePlaceId || notesObj.place_id || null;
+  const googleSyncStatus = notesObj.googleSyncStatus || (business.verification_status === 'verified' ? 'synced' : 'in_progress');
+  const verificationStatus = business.verification_status || (googleSyncStatus === 'synced' ? 'verified' : 'pending');
+
+  let verifiedUrl: string | null = null;
+  let repCoordinatesUrl: string | null = null;
+
+  // Candidate URLs from notes and columns
+  const candidateUrls = [
+    notesObj.verifiedGoogleMapsUrl,
+    notesObj.verified_google_maps_url,
+    notesObj.adminGoogleMapsUrl,
+    notesObj.googleMapsUrl,
+    business.google_maps_url
+  ].filter(Boolean) as string[];
+
+  // 1. Search for verified Google Maps link
+  for (const url of candidateUrls) {
+    if (isVerifiedGoogleMapsLink(url)) {
+      verifiedUrl = url.trim();
+      break;
+    } else if (!repCoordinatesUrl && typeof url === 'string' && url.startsWith('http')) {
+      repCoordinatesUrl = url.trim();
+    }
+  }
+
+  // 2. If Place ID exists but no verified URL was explicitly found, construct direct write-review URL
+  if (!verifiedUrl && googlePlaceId && String(googlePlaceId).trim().length > 3) {
+    verifiedUrl = `https://search.google.com/local/writereview?placeid=${googlePlaceId.trim()}`;
+  }
+
+  // 3. Check if representative coordinate link was not found yet
+  if (!repCoordinatesUrl) {
+    if (business.lat && business.lng) {
+      repCoordinatesUrl = `https://www.google.com/maps/search/?api=1&query=${business.lat},${business.lng}`;
+    }
+  }
+
+  const isVerified = Boolean(verifiedUrl) || (googleSyncStatus === 'synced' && Boolean(verifiedUrl));
+
+  return {
+    verifiedUrl,
+    isVerified,
+    repCoordinatesUrl,
+    googlePlaceId,
+    googleSyncStatus,
+    verificationStatus,
+    notesObj
+  };
+}
+
 /**
  * Fetch registered businesses from Dalilak database
  */
@@ -35,7 +154,7 @@ export async function fetchDalilakBusinesses(options?: {
   limit?: number;
 }): Promise<{ data: DalilakBusiness[]; error: string | null; isLive: boolean }> {
   const { url, key } = getDalilakConfig();
-  const limit = options?.limit || 50;
+  const limit = options?.limit || 60;
 
   try {
     const params = new URLSearchParams();
@@ -94,7 +213,9 @@ export async function fetchDalilakBusinesses(options?: {
 }
 
 /**
- * Intelligently maps a Dalilak business into a full PosterConfig
+ * Intelligently maps a Dalilak business into a full PosterConfig.
+ * Ensures that ONLY verified Google Maps links (or Place ID review links) are used for QR generation,
+ * strictly ignoring and discarding unverified representative coordinate links.
  */
 export function mapBusinessToPosterConfig(
   business: DalilakBusiness,
@@ -108,15 +229,6 @@ export function mapBusinessToPosterConfig(
   const matchedThemeId = smartTexts.suggestedTheme || 'classic-paper';
   const theme = THEME_PRESETS.find((t) => t.id === matchedThemeId) || THEME_PRESETS[0];
 
-  // Address subtitle
-  const addressParts = [
-    business.name_en,
-    business.governorate,
-    business.city,
-    business.street,
-    business.landmark
-  ].filter(Boolean);
-  
   // English Business Subtitle (Clean without duplicate words)
   let businessSubtitle = '';
   if (business.name_en && business.name_en.trim().length > 2) {
@@ -129,16 +241,19 @@ export function mapBusinessToPosterConfig(
   // Registered Phone numbers
   const registeredPhone = business.phone || business.secondary_phone || '';
 
-  // Google Maps or Rating URL
-  let qrTargetUrl = prevConfig.qrUrl;
-  if (business.google_maps_url && business.google_maps_url.startsWith('http')) {
-    qrTargetUrl = business.google_maps_url;
-  } else if (business.google_place_id) {
-    qrTargetUrl = `https://search.google.com/local/writereview?placeid=${business.google_place_id}`;
-  } else if (business.lat && business.lng) {
-    qrTargetUrl = `https://www.google.com/maps/search/?api=1&query=${business.lat},${business.lng}`;
+  // Extract verified Google Maps Link vs Unverified Rep Link
+  const googleInfo = extractBusinessGoogleInfo(business);
+
+  let qrTargetUrl = '';
+  if (googleInfo.verifiedUrl) {
+    // 1. Use the verified admin link (or Place ID review link)
+    qrTargetUrl = googleInfo.verifiedUrl;
   } else {
-    qrTargetUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(businessName + ' ' + (business.city || business.governorate || ''))}`;
+    // 2. DO NOT use the unverified representative coordinate link (?query=lat,lng).
+    // Instead, search by full business name and location to find the real listing on Google Maps.
+    const searchLocation = [business.city, business.governorate].filter(Boolean).join(' ');
+    const searchQuery = `${businessName} ${searchLocation}`.trim();
+    qrTargetUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
   }
 
   // Extract logo photo if available
@@ -207,7 +322,7 @@ export function mapBusinessToPosterConfig(
 }
 
 /**
- * Built-in fallback demo businesses
+ * Built-in fallback demo businesses with verified and pending examples
  */
 function getOfflineDemoBusinesses(): DalilakBusiness[] {
   return [
@@ -221,7 +336,14 @@ function getOfflineDemoBusinesses(): DalilakBusiness[] {
       street: 'شارع عباس العقاد',
       phone: '01012345678',
       secondary_phone: '01012345678',
-      google_maps_url: 'https://maps.google.com/?q=Al+Sultan+Restaurant',
+      verification_status: 'verified',
+      google_maps_url: 'https://maps.app.goo.gl/qkt8QvajVFCs6zLq9',
+      google_place_id: 'ChIJ_U5T7P0C_MTCPPH4P',
+      notes: JSON.stringify({
+        googleSyncStatus: 'synced',
+        googleMapsUrl: 'https://maps.app.goo.gl/qkt8QvajVFCs6zLq9',
+        googlePlaceId: 'ChIJ_U5T7P0C_MTCPPH4P'
+      }),
       invoice_number: 'DL-2026-0891',
       created_at: new Date().toISOString()
     },
@@ -235,7 +357,14 @@ function getOfflineDemoBusinesses(): DalilakBusiness[] {
       street: 'ممشى الروضة',
       phone: '01123456789',
       secondary_phone: '01123456789',
-      google_maps_url: 'https://maps.google.com/?q=Rostico+Coffee',
+      verification_status: 'verified',
+      google_maps_url: 'https://maps.app.goo.gl/4rq9NLz2sXTHUaTM7',
+      google_place_id: 'ChIJ_XR8QIVG_MTCPU398',
+      notes: JSON.stringify({
+        googleSyncStatus: 'synced',
+        googleMapsUrl: 'https://maps.app.goo.gl/4rq9NLz2sXTHUaTM7',
+        googlePlaceId: 'ChIJ_XR8QIVG_MTCPU398'
+      }),
       invoice_number: 'DL-2026-0892',
       created_at: new Date(Date.now() - 3600000).toISOString()
     },
@@ -249,7 +378,12 @@ function getOfflineDemoBusinesses(): DalilakBusiness[] {
       street: 'شارع فوزي معاذ',
       phone: '01234567890',
       secondary_phone: '01234567890',
-      google_maps_url: 'https://maps.google.com/?q=Top+Care+Detailing',
+      verification_status: 'verified',
+      google_maps_url: 'https://maps.app.goo.gl/KnWpFvop8j3sSALP8',
+      notes: JSON.stringify({
+        googleSyncStatus: 'synced',
+        googleMapsUrl: 'https://maps.app.goo.gl/KnWpFvop8j3sSALP8'
+      }),
       invoice_number: 'DL-2026-0893',
       created_at: new Date(Date.now() - 7200000).toISOString()
     },
@@ -263,7 +397,13 @@ function getOfflineDemoBusinesses(): DalilakBusiness[] {
       street: 'شارع التسعين الشمالي',
       phone: '01555512345',
       secondary_phone: '01555512345',
-      google_maps_url: 'https://maps.google.com/?q=Al+Noor+Pharmacy',
+      verification_status: 'in_progress',
+      lat: 29.968951,
+      lng: 31.090401,
+      notes: JSON.stringify({
+        googleSyncStatus: 'in_progress',
+        googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=29.968951,31.090401'
+      }),
       invoice_number: 'DL-2026-0894',
       created_at: new Date(Date.now() - 10800000).toISOString()
     },
@@ -277,7 +417,12 @@ function getOfflineDemoBusinesses(): DalilakBusiness[] {
       street: 'شارع المشاية السفلية',
       phone: '01099887766',
       secondary_phone: '01099887766',
-      google_maps_url: 'https://maps.google.com/?q=Dr+Ahmed+Tarek+Dental',
+      verification_status: 'verified',
+      google_maps_url: 'https://maps.app.goo.gl/5xKaXYGdytZBQfQT8',
+      notes: JSON.stringify({
+        googleSyncStatus: 'synced',
+        googleMapsUrl: 'https://maps.app.goo.gl/5xKaXYGdytZBQfQT8'
+      }),
       invoice_number: 'DL-2026-0895',
       created_at: new Date(Date.now() - 14400000).toISOString()
     }

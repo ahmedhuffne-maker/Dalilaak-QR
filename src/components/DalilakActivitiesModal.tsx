@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   X, 
   Search, 
@@ -15,10 +15,19 @@ import {
   Settings,
   AlertCircle,
   QrCode,
-  Zap
+  Zap,
+  ShieldCheck,
+  Clock,
+  Link as LinkIcon
 } from 'lucide-react';
 import { DalilakBusiness } from '../types';
-import { fetchDalilakBusinesses, getDalilakConfig, saveDalilakConfig, resetDalilakConfig } from '../services/dalilakService';
+import { 
+  fetchDalilakBusinesses, 
+  getDalilakConfig, 
+  saveDalilakConfig, 
+  resetDalilakConfig,
+  extractBusinessGoogleInfo 
+} from '../services/dalilakService';
 
 interface DalilakActivitiesModalProps {
   isOpen: boolean;
@@ -27,7 +36,7 @@ interface DalilakActivitiesModalProps {
 }
 
 const CATEGORY_FILTERS = [
-  { id: 'all', label: '🌟 كل الأنشطة' },
+  { id: 'all', label: '🌟 كل التصنيفات' },
   { id: 'مطاعم ومشويات', label: '🍔 مطاعم ومشويات' },
   { id: 'مقاهي وكافيهات', label: '☕ كافيهات ومقاهي' },
   { id: 'غسيل وتلميع سيارات', label: '🚗 مغاسل سيارات' },
@@ -48,6 +57,7 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'verified' | 'pending'>('all');
   const [isLive, setIsLive] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -64,7 +74,7 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
       const res = await fetchDalilakBusinesses({
         search: query,
         category: cat,
-        limit: 60
+        limit: 100
       });
       setBusinesses(res.data);
       setIsLive(res.isLive);
@@ -108,10 +118,25 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
     loadData();
   };
 
+  // Filter businesses by verification status
+  const filteredBusinesses = useMemo(() => {
+    return businesses.filter((biz) => {
+      if (statusFilter === 'all') return true;
+      const googleInfo = extractBusinessGoogleInfo(biz);
+      if (statusFilter === 'verified') return googleInfo.isVerified;
+      if (statusFilter === 'pending') return !googleInfo.isVerified;
+      return true;
+    });
+  }, [businesses, statusFilter]);
+
+  const verifiedCount = useMemo(() => {
+    return businesses.filter((biz) => extractBusinessGoogleInfo(biz).isVerified).length;
+  }, [businesses]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md animate-fade-in font-['Cairo',sans-serif]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md animate-fade-in font-['Cairo',sans-serif]">
       <div 
         className="relative w-full max-w-4xl max-h-[92vh] flex flex-col bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden shadow-black/80"
         dir="rtl"
@@ -139,7 +164,7 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
                 )}
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                اختر أي نشاط لتعبئة بياناته وتوليد بوستر التقييم وباركود الخرائط بضغطة واحدة
+                توليد باركود خرائط Google الموثق والمعتمد فقط بدون سحب روابط الرفع الأولية
               </p>
             </div>
           </div>
@@ -221,8 +246,24 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
           </form>
         )}
 
-        {/* Search & Category Filter Section */}
-        <div className="p-3 sm:p-4 bg-slate-850/70 border-b border-slate-800 flex flex-col gap-3">
+        {/* Verification Guarantee Notice Bar */}
+        <div className="px-4 py-2 bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-900 border-b border-emerald-500/20 flex items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 text-emerald-300">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="text-[11px] sm:text-xs">
+              <strong>نظام التحقق الذكي:</strong> يتم سحب <strong>الرابط الموثق المعتمد</strong> فقط لرمز الـ QR وتخطي إحداثيات الرفع غير الموثقة.
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[11px] shrink-0 text-slate-400">
+            <span>الموثقة:</span>
+            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 font-bold rounded-md border border-emerald-500/30">
+              {verifiedCount} نشاط
+            </span>
+          </div>
+        </div>
+
+        {/* Search, Verification Status Toggle & Category Filters */}
+        <div className="p-3 sm:p-4 bg-slate-850/70 border-b border-slate-800 flex flex-col gap-2.5">
           {/* Search Bar */}
           <form onSubmit={handleSearchSubmit} className="relative w-full">
             <input
@@ -242,8 +283,50 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
             </button>
           </form>
 
+          {/* Verification Status Quick Filters */}
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-slate-400 font-bold">الحالة:</span>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('all')}
+                className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all ${
+                  statusFilter === 'all'
+                    ? 'bg-slate-700 text-white font-bold'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                الكل ({businesses.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('verified')}
+                className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+                  statusFilter === 'verified'
+                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
+                    : 'text-emerald-400 hover:bg-emerald-950/40 border border-emerald-500/30'
+                }`}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>الموثقة برابط معتمد ({verifiedCount})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('pending')}
+                className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+                  statusFilter === 'pending'
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
+                    : 'text-amber-400 hover:bg-amber-950/40 border border-amber-500/30'
+                }`}
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span>قيد التوثيق ({businesses.length - verifiedCount})</span>
+              </button>
+            </div>
+          </div>
+
           {/* Category Filter Pills (Horizontal Scroll) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-700">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-700 pt-1">
             {CATEGORY_FILTERS.map((cat) => (
               <button
                 key={cat.id}
@@ -275,25 +358,34 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
               <RefreshCw className="w-8 h-8 text-amber-400 animate-spin mb-3" />
               <p className="text-sm font-semibold">جاري جلب وتحديث الأنشطة المسجلة لحظياً...</p>
             </div>
-          ) : businesses.length === 0 ? (
+          ) : filteredBusinesses.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-slate-400">
               <Store className="w-12 h-12 text-slate-600 mb-3" />
-              <p className="text-base font-bold text-slate-300">لم يتم العثور على أنشطة مطابقة للبحث</p>
-              <p className="text-xs text-slate-500 mt-1">جرب البحث بكلمة أخرى أو تغيير تصنيف الفلترة</p>
+              <p className="text-base font-bold text-slate-300">لم يتم العثور على أنشطة مطابقة للبحث أو الفلتر</p>
+              <p className="text-xs text-slate-500 mt-1">جرب تغيير حالة التوثيق أو تصنيف الفلترة</p>
             </div>
           ) : (
-            businesses.map((biz) => {
+            filteredBusinesses.map((biz) => {
               const fullAddress = [biz.governorate, biz.city, biz.street].filter(Boolean).join(' • ');
               const invoiceId = biz.invoice_number || biz.id?.replace(/^biz_/, '');
+              const googleInfo = extractBusinessGoogleInfo(biz);
 
               return (
                 <div 
                   key={biz.id}
-                  className="p-3.5 sm:p-4 rounded-2xl bg-slate-850 hover:bg-slate-800 border border-slate-750 hover:border-amber-500/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 group shadow-sm hover:shadow-md"
+                  className={`p-3.5 sm:p-4 rounded-2xl bg-slate-850 hover:bg-slate-800 border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 group shadow-sm hover:shadow-md ${
+                    googleInfo.isVerified 
+                      ? 'border-emerald-500/30 hover:border-emerald-400' 
+                      : 'border-slate-750 hover:border-amber-500/40'
+                  }`}
                 >
                   {/* Business Main Info */}
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-700 border border-slate-600 flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-105 group-hover:border-amber-500/50 transition-all shadow-inner">
+                    <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center shrink-0 group-hover:scale-105 transition-all shadow-inner ${
+                      googleInfo.isVerified
+                        ? 'bg-gradient-to-tr from-emerald-950 to-slate-800 border-emerald-500/50 text-emerald-400'
+                        : 'bg-gradient-to-tr from-slate-800 to-slate-700 border-slate-600 text-amber-400'
+                    }`}>
                       <Store className="w-5 h-5" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -301,6 +393,20 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
                         <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-amber-300 transition-colors truncate">
                           {biz.name_ar}
                         </h3>
+                        
+                        {/* Verified vs Pending Google Maps Badge */}
+                        {googleInfo.isVerified ? (
+                          <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/40">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                            <span>رابط خرائط موثق معتمد</span>
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/40">
+                            <Clock className="w-3 h-3 text-amber-400" />
+                            <span>قيد التوثيق (إحداثيات مندوب)</span>
+                          </span>
+                        )}
+
                         {biz.category && (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-750 text-slate-300 border border-slate-700">
                             {biz.category}
@@ -319,12 +425,12 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
                         </p>
                       )}
 
-                      {/* Location & Contacts */}
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-slate-400">
+                      {/* Location, Contacts & Verified Link preview */}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1.5 text-xs text-slate-400">
                         {fullAddress && (
                           <span className="flex items-center gap-1">
                             <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                            <span className="truncate max-w-[220px] sm:max-w-none">{fullAddress}</span>
+                            <span className="truncate max-w-[200px] sm:max-w-none">{fullAddress}</span>
                           </span>
                         )}
                         {biz.phone && (
@@ -333,21 +439,41 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
                             <span>{biz.phone}</span>
                           </span>
                         )}
+
+                        {/* Direct Google Maps Link Preview if verified */}
+                        {googleInfo.verifiedUrl && (
+                          <a
+                            href={googleInfo.verifiedUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 hover:text-emerald-300 hover:underline bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30"
+                            title="معاينة رابط خرائط جوجل المعتمد"
+                          >
+                            <LinkIcon className="w-3 h-3" />
+                            <span className="max-w-[140px] truncate">{googleInfo.verifiedUrl.replace(/^https?:\/\//, '')}</span>
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   {/* Trigger Generator Button */}
-                  <div className="w-full sm:w-auto flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
+                  <div className="w-full sm:w-auto flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800 shrink-0">
                     <button
                       onClick={() => {
                         onSelectBusiness(biz);
                         onClose();
                       }}
-                      className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 active:scale-95 transition-all"
+                      className={`w-full sm:w-auto px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all ${
+                        googleInfo.isVerified
+                          ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 shadow-amber-500/20 hover:shadow-amber-500/40'
+                          : 'bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-amber-500/20 hover:shadow-amber-500/40'
+                      }`}
                     >
                       <Zap className="w-4 h-4 fill-slate-950" />
-                      <span>توليد الملصق والبوستر</span>
+                      <span>{googleInfo.isVerified ? 'توليد البوستر (رابط موثق 🟢)' : 'توليد البوستر للنشاط'}</span>
                     </button>
                   </div>
                 </div>
@@ -358,8 +484,8 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
 
         {/* Modal Footer Summary */}
         <div className="p-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-          <span>إجمالي الأنشطة المعروضة: <strong className="text-amber-400">{businesses.length}</strong></span>
-          <span className="text-[11px] text-slate-500">نظام QR Booster المستقل • الربط اللحظي بقاعدة دليلك</span>
+          <span>إجمالي الأنشطة المعروضة: <strong className="text-amber-400">{filteredBusinesses.length}</strong> (منها <strong className="text-emerald-400">{verifiedCount}</strong> موثقة برابط معتمد)</span>
+          <span className="text-[11px] text-slate-500">نظام QR Booster • الربط اللحظي بقاعدة دليلك</span>
         </div>
       </div>
     </div>
