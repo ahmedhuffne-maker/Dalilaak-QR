@@ -45,25 +45,40 @@ export function isVerifiedGoogleMapsLink(url: string | null | undefined): boolea
 
   // 1. Reject any search query URLs or raw representative coordinates
   const isSearchQuery = /\/maps\/search\//i.test(trimmed);
-  const isRawCoordQuery = /[?&]query=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
-  const isRawQCoord = /[?&]q=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
+  const isRawCoordQuery = /[?&]query=(?:loc:)?-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
+  const isRawQCoord = /[?&]q=(?:loc:)?-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
   const isRawAtCoord = /\/maps\/@-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
-  const isRawPlaceCoord = /\/maps\/place\/-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
+  const isRawPlaceCoord = /\/maps\/place\/(?:loc:)?-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
+  const isRawDirCoord = /\/maps\/dir\/[^\/]*\/-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
+  const isRawLlCoord = /[?&]ll=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
+  const isRawDaddrCoord = /[?&]daddr=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
+  const isRawSaddrCoord = /[?&]saddr=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
 
-  if (isSearchQuery || isRawCoordQuery || isRawQCoord || isRawAtCoord || isRawPlaceCoord) {
+  if (
+    isSearchQuery ||
+    isRawCoordQuery ||
+    isRawQCoord ||
+    isRawAtCoord ||
+    isRawPlaceCoord ||
+    isRawDirCoord ||
+    isRawLlCoord ||
+    isRawDaddrCoord ||
+    isRawSaddrCoord
+  ) {
     return false;
   }
 
   // 2. Check for known official verified link formats (short links, review links, CID links, place profile links)
   if (/maps\.app\.goo\.gl\/[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
   if (/goo\.gl\/maps\/[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
-  if (/g\.page\/r\/[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
+  if (/g\.page\/(?:r\/)?[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
   if (/search\.google\.com\/local\/(writereview|reviews)\?placeid=/i.test(trimmed)) return true;
-  if (/[?&]cid=\d+/i.test(trimmed)) return true;
-  if (/[?&]query_place_id=/i.test(trimmed)) return true;
+  if (/[?&](?:cid|ludocid)=\d+/i.test(trimmed)) return true;
+  if (/[?&]query_place_id=[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
+  if (/[?&]ftid=[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
 
   // 3. If it contains an established named place on Google Maps (not coordinates)
-  if (/\/maps\/place\/[^\/?#]+/i.test(trimmed)) {
+  if (/\/maps\/place\/[^\/?#]+(?:\/data=|\/?[?&]entry=|\/?[?&]g_ep=)/i.test(trimmed)) {
     return true;
   }
 
@@ -88,19 +103,52 @@ export function extractBusinessGoogleInfo(business: DalilakBusiness): DalilakGoo
     }
   }
 
-  const googlePlaceId = business.google_place_id || notesObj.googlePlaceId || notesObj.place_id || null;
-  const googleSyncStatus = notesObj.googleSyncStatus || (business.verification_status === 'verified' ? 'synced' : 'in_progress');
-  const verificationStatus = business.verification_status || (googleSyncStatus === 'synced' ? 'verified' : 'pending');
+  const googlePlaceId =
+    business.google_place_id ||
+    notesObj.googlePlaceId ||
+    notesObj.google_place_id ||
+    notesObj.placeId ||
+    notesObj.place_id ||
+    null;
+
+  const googleCid =
+    notesObj.google_cid ||
+    notesObj.googleCid ||
+    notesObj.cid ||
+    notesObj.ludocid ||
+    null;
+
+  const googleSyncStatus =
+    notesObj.googleSyncStatus ||
+    notesObj.google_sync_status ||
+    notesObj.sync_status ||
+    (business.verification_status === 'verified' ? 'synced' : 'in_progress');
+
+  const verificationStatus =
+    business.verification_status ||
+    notesObj.verification_status ||
+    (googleSyncStatus === 'synced' ? 'verified' : 'pending');
 
   let verifiedUrl: string | null = null;
   let repCoordinatesUrl: string | null = null;
 
-  // Candidate URLs from notes and columns
+  // Candidate URLs from notes and columns in strict order of priority
   const candidateUrls = [
     notesObj.verifiedGoogleMapsUrl,
     notesObj.verified_google_maps_url,
+    notesObj.verifiedUrl,
+    notesObj.verified_url,
     notesObj.adminGoogleMapsUrl,
+    notesObj.admin_google_maps_url,
+    notesObj.googleReviewUrl,
+    notesObj.google_review_url,
+    notesObj.reviewUrl,
+    notesObj.review_url,
+    notesObj.review_link,
+    notesObj.google_place_url,
+    notesObj.share_url,
     notesObj.googleMapsUrl,
+    notesObj.google_maps_url,
     business.google_maps_url
   ].filter(Boolean) as string[];
 
@@ -116,23 +164,29 @@ export function extractBusinessGoogleInfo(business: DalilakBusiness): DalilakGoo
 
   // 2. If Place ID exists but no verified URL was explicitly found, construct direct write-review URL
   if (!verifiedUrl && googlePlaceId && String(googlePlaceId).trim().length > 3) {
-    verifiedUrl = `https://search.google.com/local/writereview?placeid=${googlePlaceId.trim()}`;
+    const cleanPlaceId = String(googlePlaceId).trim();
+    verifiedUrl = `https://search.google.com/local/writereview?placeid=${cleanPlaceId}`;
   }
 
-  // 3. Check if representative coordinate link was not found yet
+  // 3. If CID exists and no verified URL yet, construct direct CID link
+  if (!verifiedUrl && googleCid && /^\d+$/.test(String(googleCid).trim())) {
+    verifiedUrl = `https://maps.google.com/?cid=${String(googleCid).trim()}`;
+  }
+
+  // 4. Check if representative coordinate link was not found yet
   if (!repCoordinatesUrl) {
     if (business.lat && business.lng) {
       repCoordinatesUrl = `https://www.google.com/maps/search/?api=1&query=${business.lat},${business.lng}`;
     }
   }
 
-  const isVerified = Boolean(verifiedUrl) || (googleSyncStatus === 'synced' && Boolean(verifiedUrl));
+  const isVerified = Boolean(verifiedUrl);
 
   return {
     verifiedUrl,
     isVerified,
     repCoordinatesUrl,
-    googlePlaceId,
+    googlePlaceId: googlePlaceId ? String(googlePlaceId).trim() : null,
     googleSyncStatus,
     verificationStatus,
     notesObj
