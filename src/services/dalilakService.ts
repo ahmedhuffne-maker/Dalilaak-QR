@@ -43,7 +43,18 @@ export function isVerifiedGoogleMapsLink(url: string | null | undefined): boolea
   if (!url || typeof url !== 'string' || !url.startsWith('http')) return false;
   const trimmed = url.trim();
 
-  // 1. Check for known verified link formats (short links, review links, CID links, place profile links)
+  // 1. Reject any search query URLs or raw representative coordinates
+  const isSearchQuery = /\/maps\/search\//i.test(trimmed);
+  const isRawCoordQuery = /[?&]query=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
+  const isRawQCoord = /[?&]q=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
+  const isRawAtCoord = /\/maps\/@-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
+  const isRawPlaceCoord = /\/maps\/place\/-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
+
+  if (isSearchQuery || isRawCoordQuery || isRawQCoord || isRawAtCoord || isRawPlaceCoord) {
+    return false;
+  }
+
+  // 2. Check for known official verified link formats (short links, review links, CID links, place profile links)
   if (/maps\.app\.goo\.gl\/[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
   if (/goo\.gl\/maps\/[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
   if (/g\.page\/r\/[a-zA-Z0-9_-]+/i.test(trimmed)) return true;
@@ -51,24 +62,8 @@ export function isVerifiedGoogleMapsLink(url: string | null | undefined): boolea
   if (/[?&]cid=\d+/i.test(trimmed)) return true;
   if (/[?&]query_place_id=/i.test(trimmed)) return true;
 
-  // 2. Identify and reject raw representative coordinates query URLs (e.g. ?api=1&query=29.968951,31.090401 or ?q=29.968951,31.090401)
-  // Representative links drop a generic blank pin at coordinates without an established business profile.
-  const isRawCoordQuery = /[?&]query=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
-  const isRawQCoord = /[?&]q=-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?(?:&|$)/i.test(trimmed);
-  const isRawAtCoord = /\/maps\/@-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
-  const isRawPlaceCoord = /\/maps\/place\/-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?/i.test(trimmed);
-
-  if (isRawCoordQuery || isRawQCoord || isRawAtCoord || isRawPlaceCoord) {
-    return false;
-  }
-
-  // 3. If it contains a named place or custom business path on google maps
+  // 3. If it contains an established named place on Google Maps (not coordinates)
   if (/\/maps\/place\/[^\/?#]+/i.test(trimmed)) {
-    return true;
-  }
-
-  // If it's a general google link with business query rather than bare numbers
-  if (/google\.com\/maps/i.test(trimmed)) {
     return true;
   }
 
@@ -245,15 +240,13 @@ export function mapBusinessToPosterConfig(
   const googleInfo = extractBusinessGoogleInfo(business);
 
   let qrTargetUrl = '';
-  if (googleInfo.verifiedUrl) {
-    // 1. Use the verified admin link (or Place ID review link)
+  if (googleInfo.isVerified && googleInfo.verifiedUrl) {
+    // 1. STRICT: Only use the verified Google Maps place/review link
     qrTargetUrl = googleInfo.verifiedUrl;
   } else {
-    // 2. DO NOT use the unverified representative coordinate link (?query=lat,lng).
-    // Instead, search by full business name and location to find the real listing on Google Maps.
-    const searchLocation = [business.city, business.governorate].filter(Boolean).join(' ');
-    const searchQuery = `${businessName} ${searchLocation}`.trim();
-    qrTargetUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
+    // 2. STRICT: NEVER generate an unverified link, search query, or representative coordinates.
+    // If not verified, leave empty so no inaccurate QR code is generated.
+    qrTargetUrl = '';
   }
 
   // Extract logo photo if available
@@ -318,6 +311,29 @@ export function mapBusinessToPosterConfig(
     dalilakSubtext: 'المنصة الشاملة لإدارة وتوثيق الأنشطة والخدمات الميدانية',
     footerWebsite: 'www.dalilaak.com',
     showGoogleBadge: true
+  };
+}
+
+export interface DalilakBusinessMappingResult {
+  config: PosterConfig;
+  isVerified: boolean;
+  verifiedUrl: string | null;
+  businessName: string;
+}
+
+export function mapBusinessToPosterConfigWithStatus(
+  business: DalilakBusiness,
+  prevConfig: PosterConfig
+): DalilakBusinessMappingResult {
+  const googleInfo = extractBusinessGoogleInfo(business);
+  const updatedConfig = mapBusinessToPosterConfig(business, prevConfig);
+  const isVerified = Boolean(googleInfo.isVerified && googleInfo.verifiedUrl);
+
+  return {
+    config: updatedConfig,
+    isVerified,
+    verifiedUrl: googleInfo.verifiedUrl,
+    businessName: business.name_ar || business.name_en || 'النشاط'
   };
 }
 

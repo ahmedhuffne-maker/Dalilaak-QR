@@ -398,12 +398,12 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
                         {googleInfo.isVerified ? (
                           <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/40">
                             <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                            <span>رابط خرائط موثق معتمد</span>
+                            <span>رابط خرائط موثق ومعتمد 🟢</span>
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/40">
-                            <Clock className="w-3 h-3 text-amber-400" />
-                            <span>قيد التوثيق (إحداثيات مندوب)</span>
+                          <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/40">
+                            <AlertCircle className="w-3 h-3 text-rose-400" />
+                            <span>غير موثق (لا يوجد رابط Google معتمد ⚠️)</span>
                           </span>
                         )}
 
@@ -441,7 +441,7 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
                         )}
 
                         {/* Direct Google Maps Link Preview if verified */}
-                        {googleInfo.verifiedUrl && (
+                        {googleInfo.verifiedUrl ? (
                           <a
                             href={googleInfo.verifiedUrl}
                             target="_blank"
@@ -454,6 +454,10 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
                             <span className="max-w-[140px] truncate">{googleInfo.verifiedUrl.replace(/^https?:\/\//, '')}</span>
                             <ExternalLink className="w-2.5 h-2.5" />
                           </a>
+                        ) : (
+                          <span className="text-[11px] text-rose-400/80 font-medium">
+                            ⚠️ لن يتم توليد رمز QR لعدم وجود رابط معتمد
+                          </span>
                         )}
                       </div>
                     </div>
@@ -463,17 +467,32 @@ export const DalilakActivitiesModal: React.FC<DalilakActivitiesModalProps> = ({
                   <div className="w-full sm:w-auto flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800 shrink-0">
                     <button
                       onClick={() => {
+                        if (!googleInfo.isVerified || !googleInfo.verifiedUrl) {
+                          const proceed = window.confirm(
+                            `⚠️ تنبيه هام:\n\nالنشاط «${biz.name_ar}» لا يمتلك رابط خرائط Google موثق ومعتمد حتى الآن.\n\nوفقاً لتعليمات النظام، لن يتم توليد رمز QR تجنباً لإنشاء روابط غير دقيقة أو إحداثيات مؤقتة.\n\nهل تريد استدعاء بيانات النشاط بدون رمز QR؟`
+                          );
+                          if (!proceed) return;
+                        }
                         onSelectBusiness(biz);
                         onClose();
                       }}
                       className={`w-full sm:w-auto px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all ${
                         googleInfo.isVerified
                           ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 shadow-amber-500/20 hover:shadow-amber-500/40'
-                          : 'bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-amber-500/20 hover:shadow-amber-500/40'
+                          : 'bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/40 shadow-sm'
                       }`}
                     >
-                      <Zap className="w-4 h-4 fill-slate-950" />
-                      <span>{googleInfo.isVerified ? 'توليد البوستر (رابط موثق 🟢)' : 'توليد البوستر للنشاط'}</span>
+                      {googleInfo.isVerified ? (
+                        <>
+                          <Zap className="w-4 h-4 fill-slate-950" />
+                          <span>توليد بالرابط الموثق 🟢</span>
+                        </>
+                      ) : (
+                        <>
+                          <AlertCircle className="w-4 h-4 text-amber-400" />
+                          <span>استدعاء (بدون رمز QR ⚠️)</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

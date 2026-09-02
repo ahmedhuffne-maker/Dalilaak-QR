@@ -641,29 +641,69 @@ async function drawStyledQrBox(
       await drawCenterLogoInQr(ctx, config, boxCenterX, boxCenterY, qrInnerSize);
     }
   } else {
-    // Generate crisp QR code
-    try {
-      const qrDataUrl = await QRCode.toDataURL(config.qrUrl || 'https://maps.google.com', {
-        width: Math.round(qrInnerSize * 2.5),
-        margin: 1,
-        color: {
-          dark: config.qrColor || '#000000',
-          light: config.qrBgColor || '#ffffff'
-        },
-        errorCorrectionLevel: 'H'
-      });
-      const generatedQrImg = await loadImage(qrDataUrl);
-      if (generatedQrImg) {
-        ctx.save();
-        ctx.imageSmoothingEnabled = false; // Keep QR pixels ultra-crisp
-        ctx.drawImage(generatedQrImg, qrX, qrY, qrInnerSize, qrInnerSize);
-        ctx.restore();
+    // Check if QR URL is available
+    if (!config.qrUrl || !config.qrUrl.trim()) {
+      // Draw professional pending placeholder instead of deceptive generic QR code
+      ctx.save();
+      ctx.fillStyle = '#fefce8';
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 5]);
+      drawRoundRect(ctx, qrX, qrY, qrInnerSize, qrInnerSize, 14, true, true);
+      ctx.setLineDash([]);
 
-        // Render center logo (Dalilak, Google, WhatsApp, etc.)
-        await drawCenterLogoInQr(ctx, config, boxCenterX, boxCenterY, qrInnerSize);
+      const pCenterX = qrX + qrInnerSize / 2;
+      const pCenterY = qrY + qrInnerSize / 2;
+
+      // Icon circle
+      ctx.fillStyle = '#fef3c7';
+      ctx.beginPath();
+      ctx.arc(pCenterX, pCenterY - 26, 24, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Warning exclamation mark
+      ctx.fillStyle = '#b45309';
+      ctx.font = 'bold 26px "Cairo", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('!', pCenterX, pCenterY - 25);
+
+      // Warning primary text
+      ctx.fillStyle = '#92400e';
+      ctx.font = 'bold 13px "Cairo", sans-serif';
+      ctx.fillText('بانتظار رابط موثق من Google', pCenterX, pCenterY + 16);
+
+      // Secondary guidance text
+      ctx.fillStyle = '#b45309';
+      ctx.font = '10.5px "Cairo", sans-serif';
+      ctx.fillText('لم يتم توليد رمز QR لعدم توفر رابط معتمد', pCenterX, pCenterY + 34);
+
+      ctx.restore();
+    } else {
+      // Generate crisp QR code
+      try {
+        const qrDataUrl = await QRCode.toDataURL(config.qrUrl.trim(), {
+          width: Math.round(qrInnerSize * 2.5),
+          margin: 1,
+          color: {
+            dark: config.qrColor || '#000000',
+            light: config.qrBgColor || '#ffffff'
+          },
+          errorCorrectionLevel: 'H'
+        });
+        const generatedQrImg = await loadImage(qrDataUrl);
+        if (generatedQrImg) {
+          ctx.save();
+          ctx.imageSmoothingEnabled = false; // Keep QR pixels ultra-crisp
+          ctx.drawImage(generatedQrImg, qrX, qrY, qrInnerSize, qrInnerSize);
+          ctx.restore();
+
+          // Render center logo (Dalilak, Google, WhatsApp, etc.)
+          await drawCenterLogoInQr(ctx, config, boxCenterX, boxCenterY, qrInnerSize);
+        }
+      } catch (err) {
+        console.error('Error generating QR code:', err);
       }
-    } catch (err) {
-      console.error('Error generating QR code:', err);
     }
   }
 }

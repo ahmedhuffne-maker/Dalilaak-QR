@@ -11,6 +11,8 @@ import {
   Sparkles, 
   Star, 
   Check, 
+  CheckCircle2,
+  AlertCircle,
   ExternalLink, 
   Phone, 
   Hash,
@@ -78,6 +80,7 @@ import {
 } from '../utils/textGeneratorEngine';
 import { AiTextModal } from './AiTextModal';
 import { DETAILED_CATEGORIES, rephraseTextWithAi } from '../utils/aiTextGenerator';
+import { isVerifiedGoogleMapsLink } from '../services/dalilakService';
 
 const RenderBusinessIcon: React.FC<{ iconId: string; className?: string }> = ({ iconId, className = 'w-5 h-5' }) => {
   switch (iconId) {
@@ -739,19 +742,48 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({
                     placeholder="https://g.page/r/your-business/review"
                     className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-left font-mono min-h-[44px]"
                   />
-                  <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-400">
-                    <span>💡 يمكنك وضع رابط تقييم Google Maps المباشر لنشاطك</span>
-                    {config.qrUrl && (
+                  {/* Verified Google Maps status badge or missing link warning */}
+                  {!config.qrUrl ? (
+                    <div className="mt-2.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-2.5 text-xs text-amber-300">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold">⚠️ رمز QR غير مفعل (لا يوجد رابط معتمد)</p>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          لم يتم توليد رمز QR لعدم توفر رابط خرائط Google موثق لهذا النشاط. يمكنك لصق رابط التقييم المعتمد هنا لتوليده فوراً.
+                        </p>
+                      </div>
+                    </div>
+                  ) : isVerifiedGoogleMapsLink(config.qrUrl) ? (
+                    <div className="mt-2.5 p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between text-xs text-emerald-300">
+                      <span className="flex items-center gap-1.5 font-bold">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>رابط خرائط Google موثق ومعتمد 🟢</span>
+                      </span>
                       <a
                         href={config.qrUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-amber-400 hover:underline flex items-center gap-1 font-bold"
+                        className="text-emerald-400 hover:text-emerald-300 hover:underline flex items-center gap-1 font-bold text-[11px]"
                       >
                         تجربة الرابط <ExternalLink className="w-3 h-3" />
                       </a>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="mt-2.5 p-2.5 rounded-xl bg-slate-800/80 border border-amber-500/30 flex items-center justify-between text-xs text-amber-300">
+                      <span className="flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>رابط مخصص (ليس رابط مكان معتمد رسمي)</span>
+                      </span>
+                      <a
+                        href={config.qrUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-amber-400 hover:underline flex items-center gap-1 font-bold text-[11px]"
+                      >
+                        تجربة الرابط <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
                 </div>
 
                 {/* QR Custom Color */}

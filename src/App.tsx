@@ -21,11 +21,13 @@ import {
   Eye,
   Download,
   Printer,
-  Wand2
+  Wand2,
+  AlertTriangle,
+  X
 } from 'lucide-react';
 
 import { DalilakActivitiesModal } from './components/DalilakActivitiesModal';
-import { mapBusinessToPosterConfig } from './services/dalilakService';
+import { mapBusinessToPosterConfig, mapBusinessToPosterConfigWithStatus } from './services/dalilakService';
 import { DalilakBusiness } from './types';
 
 const INITIAL_CONFIG: PosterConfig = {
@@ -92,20 +94,37 @@ export default function App() {
   const [showTips, setShowTips] = useState<boolean>(false);
   const [mobileActiveView, setMobileActiveView] = useState<'controls' | 'preview'>('controls');
   const [isDalilakModalOpen, setIsDalilakModalOpen] = useState<boolean>(false);
+  const [dalilakNotice, setDalilakNotice] = useState<{
+    type: 'verified' | 'unverified';
+    businessName: string;
+    verifiedUrl?: string;
+  } | null>(null);
 
   // Handle selecting a live Dalilak business
   const handleSelectDalilakBusiness = (business: DalilakBusiness) => {
-    const updatedConfig = mapBusinessToPosterConfig(business, config);
-    setConfig(updatedConfig);
+    const result = mapBusinessToPosterConfigWithStatus(business, config);
+    setConfig(result.config);
     
     // Switch to preview on mobile to see result instantly
     setMobileActiveView('preview');
 
-    confetti({
-      particleCount: 70,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    if (result.isVerified && result.verifiedUrl) {
+      setDalilakNotice({
+        type: 'verified',
+        businessName: result.businessName,
+        verifiedUrl: result.verifiedUrl
+      });
+      confetti({
+        particleCount: 70,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    } else {
+      setDalilakNotice({
+        type: 'unverified',
+        businessName: result.businessName
+      });
+    }
   };
 
   // Apply Business Preset
@@ -251,6 +270,93 @@ export default function App() {
             {isRendering && <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />}
           </button>
         </div>
+
+        {/* Dalilak Business Selection Notice Banner */}
+        {dalilakNotice && (
+          <div className="mb-5 animate-fade-in" dir="rtl">
+            {dalilakNotice.type === 'verified' ? (
+              <div className="p-4 rounded-2xl bg-emerald-950/70 border border-emerald-500/50 text-emerald-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg shadow-emerald-950/40">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 font-bold text-sm text-white">
+                      <span>تم استدعاء النشاط بنجاح وتوليد كود QR الموثق من Google 🟢</span>
+                      <span className="text-xs font-normal text-emerald-300">({dalilakNotice.businessName})</span>
+                    </div>
+                    <p className="text-xs text-emerald-300/90 mt-0.5">
+                      تم التحقق من اعتماد الرابط رسمياً وربطه بالملصق لتوجيه العملاء مباشرة لصفحة التقييم وكتابة الآراء.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                  {dalilakNotice.verifiedUrl && (
+                    <a
+                      href={dalilakNotice.verifiedUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs hover:bg-emerald-400 transition-colors flex items-center gap-1 shadow"
+                    >
+                      <span>تجربة الرابط</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setDalilakNotice(null)}
+                    className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-emerald-900/50"
+                    title="إغلاق التنبيه"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-950/90 via-slate-900 to-amber-950/80 border-2 border-rose-500/70 text-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl shadow-rose-950/50">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/25 border border-rose-500/50 flex items-center justify-center text-rose-400 shrink-0 mt-0.5">
+                    <AlertTriangle className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 font-bold text-sm sm:text-base text-rose-200">
+                      <span>⚠️ تنبيه هام: لم يتم توليد كود QR لعدم توفر رابط Google موثق ومعتمد!</span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                      النشاط «<strong className="text-amber-300">{dalilakNotice.businessName}</strong>» مسجل بإحداثيات موقع أو حالة قيد التوثيق، ولا يمتلك رابط خرائط Google معتمد حتى الآن.
+                      <br className="hidden sm:inline" />
+                      <span className="text-rose-300 font-bold"> تطبيقاً لسياسة النظام الصارمة:</span> تم منع توليد أي روابط بديلة أو عشوائية لحماية دقة المطبوعات. يمكنك إدخال الرابط المعتمد يدوياً في لوحة التحكم عند توفره.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                  <button
+                    onClick={() => {
+                      setMobileActiveView('controls');
+                      setTimeout(() => {
+                        const qrInput = document.getElementById('input-qr-url');
+                        if (qrInput) {
+                          qrInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          qrInput.focus();
+                        }
+                      }, 100);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>إدخال الرابط يدوياً</span>
+                  </button>
+                  <button
+                    onClick={() => setDalilakNotice(null)}
+                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 cursor-pointer"
+                    title="إغلاق التنبيه"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* 2-Column Professional Studio Workspace */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
